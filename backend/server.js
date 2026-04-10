@@ -33,7 +33,7 @@ app.use(express.static(buildPath));
 
 // Catch-all route for any request that doesn't match the API routes
 // This allows React Router to handle page refreshing etc.
-app.get("*", (req, res) => {
+app.get("/*", (req, res) => {
   if (req.path.startsWith("/api")) return res.status(404).json({ message: "API route not found" });
   res.sendFile(path.join(buildPath, "index.html"));
 });
