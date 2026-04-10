@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import "./App.css";
+import { useApp } from "./context/AppContext";
 
 const WHATSAPP = "918106296055";
 const API = `http://${window.location.hostname}:5000/api`;
@@ -1279,6 +1280,7 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
 
 // ── ADMIN ──
 function Admin({ eventsData, setEventsData, bookings, setBookings, onOpenInvoice }) {
+  const { loggedInUser } = useApp();
   const revealRef = useSectionReveal();
   const [unlocked, setUnlocked] = useState(false);
   const [user, setUser] = useState(""); const [pass, setPass] = useState("");
@@ -2836,7 +2838,6 @@ function AIChatbot() {
 }
 
 // ── MAIN APP ──
-import { useApp } from "./context/AppContext";
 
 export default function App() {
   const { 

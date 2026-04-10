@@ -9,7 +9,6 @@
 /coverage
 
 # production
-/build
 .env
 .env.production
 .env.production.local
