@@ -24,6 +24,7 @@ app.use("/api/upload",   require("./routes/upload.routes"));
 
 // ── TEST ROUTE ──
 app.get("/", (req, res) => res.json({ message: "MomentO Backend Running! ✦" }));
+app.get("/api/health", (req, res) => res.status(200).json({ status: "UP", timestamp: new Date() }));
 
 // ── CONNECT DB + START SERVER ──
 mongoose.connect(process.env.MONGO_URI)
