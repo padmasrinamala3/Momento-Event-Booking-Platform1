@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+# ✨ MomentO - Premium Event Management Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**MomentO** is a sophisticated and professional event management platform designed to deliver a seamless event planning experience. From grand weddings to intimate birthday parties, the platform ensures precision in budgeting, theme selection, and booking management.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🚀 Key Features
 
-### `npm start`
+1. **Numbered Theme Gallery**: Every event category features a dedicated gallery of numbered decoration themes. Clients can visually browse high-resolution images and select their preferred theme number during the booking process.
+2. **Dynamic Cost Calculator**: A real-time estimation tool where costs for catering (Silver, Gold, Platinum tiers with **Detailed Menu Previews**) and other services automatically adjust based on guest count and food type. This allows for transparent and instant budget planning.
+3. **Advanced Shift System**: Support for multiple event timings to accommodate diverse requirements:
+   - **Morning**: 8 AM - 3 PM
+   - **Night**: 6 PM - 11 PM
+   - **Midnight**: 11 PM - 3 AM (✨ New)
+4. **Premium Client Dashboard**: A dedicated "My Account" area where users can monitor their booking history, track real-time status updates (Processing/Confirmed), and access invoices.
+5. **Admin Command Center**: A powerful administrative interface equipped with live sound notifications and desktop-style alerts for new bookings.
+6. **Flexible Payment Options**: Support for multiple payment structures including Full Payment, mandatory 30% Advance to secure dates, or a 3-month EMI plan.
+7. **AI Virtual Assistant (Smart Bot)**: An intelligent chatbot providing instant budget-based event recommendations and chat history management (Clear Chat).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠 Step-by-Step User Journey
 
-### `npm test`
+### 1. Browse & Select Event
+Browse the diverse event categories (Wedding, Birthday, Corporate, etc.) on the home page. Click on any event image to explore the numbered theme gallery to see high-resolution decoration examples.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2. Estimate Costs
+Navigate to the **"Event Cost Calculator"** section. Select your event type and enter your estimated guest count. Toggle specific services like Catering, DJ, or Drone Photography to see an instant breakdown of the total amount and EMI options.
 
-### `npm run build`
+### 3. Registration / Login
+Register or log in using your name and phone number before proceeding. This ensures all your bookings and payment details are securely linked to your account.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 4. Provide Booking Details
+When you click "Book Now," a detailed reservation form opens:
+- **Phone Number**: Strict 10-digit numeric validation.
+- **Guest Count & Food Type**: Choose between Silver, Gold, or Platinum catering and select your preference for Vegetarian (🥬) or Non-Vegetarian (🍗). You can view the **Detailed Menu** for each tier and mention your favorite custom dishes in the "Special Requirements" box for our manager to finalize.
+- **Shift Selection**: Select between Morning, Night, or Midnight slots.
+- **Venue & Address**: Choose a city location from the dropdown and provide a detailed full address.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 5. Secure Payment Gateway
+Complete your booking via a realistic payment gateway simulation. Choose your payment mode (Advance/Full/EMI). Upon success, enjoy a celebratory confetti animation and instant booking confirmation.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 6. Monitor via Dashboard
+Visit the **"My Account"** section to see your booking cards. Once the admin reviews and approves your request, your status will update from "Processing" to "Confirmed."
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 💻 Technical Stack
+- **Frontend**: React.js with Vanilla CSS.
+- **Visuals**: Premium glassmorphism UI with gold-themed aesthetic.
+- **Core Logic**: Real-time pricing engines, shift-based availability tracking, and live administrative state management.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
+*Created with Excellence for MomentO Premium Events.*
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
