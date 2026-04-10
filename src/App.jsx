@@ -1299,6 +1299,13 @@ function Admin({ eventsData, setEventsData, bookings, setBookings, onOpenInvoice
     lastBookingCount.current = bookings.length;
   }, [bookings, unlocked]);
 
+  // Auto-unlock if user is admin
+  useEffect(() => {
+    if (loggedInUser?.role === "admin") {
+      setUnlocked(true);
+    }
+  }, [loggedInUser]);
+
   // Fetch reviews when unlocked
   useEffect(() => {
     if (unlocked) {
@@ -2829,11 +2836,17 @@ function AIChatbot() {
 }
 
 // ── MAIN APP ──
+import { useApp } from "./context/AppContext";
+
 export default function App() {
+  const { 
+    eventsData, setEventsData, 
+    bookings, setBookings, 
+    loggedInUser, setLoggedInUser,
+    logout
+  } = useApp();
+
   const [loaded, setLoaded] = useState(false);
-  const [eventsData, setEventsData] = useState(eventsDataDefault);
-  const [bookings, setBookings] = useState([]);
-  const [loggedInUser, setLoggedInUser] = useState(null);
   const [bookingEvent, setBookingEvent] = useState(null);
   const [pkgData, setPkgData] = useState(null);
   const [invoiceId, setInvoiceId] = useState(null);
@@ -2898,7 +2911,7 @@ export default function App() {
       <ScrollProgressBar />
       <ToastContainer />
       <BackToTop />
-      <Navbar loggedInUser={loggedInUser} onLogout={() => { setLoggedInUser(null); showToast("✓ Logged out", ""); }} />
+      <Navbar loggedInUser={loggedInUser} onLogout={logout} />
       <Hero onExplore={navTo} />
       <About />
       <Events eventsData={eventsData} onReserve={handleReserve} onViewThemes={setGalleryEvent} />

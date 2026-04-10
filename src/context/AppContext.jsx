@@ -7,7 +7,15 @@ export const AppProvider = ({ children }) => {
 
   const [eventsData, setEventsData] = useState(eventsDataDefault);
   const [bookings, setBookings] = useState([]);
-  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+    const saved = localStorage.getItem("momento_user");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const logout = () => {
+    localStorage.removeItem("momento_user");
+    setLoggedInUser(null);
+  };
 
   const addBooking = (booking) => {
     setBookings(p => [...p, booking]);
@@ -22,7 +30,8 @@ export const AppProvider = ({ children }) => {
         setBookings,   // ✅ ADD THIS
         addBooking,
         loggedInUser,
-        setLoggedInUser
+        setLoggedInUser,
+        logout
       }}
     >
       {children}
