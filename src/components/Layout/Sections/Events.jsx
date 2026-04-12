@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useApp } from "../../context/AppContext";
 import { showToast } from "../Layout/Layout";
 
-const Events = ({ onReserve }) => {
+const Events = ({ onReserve, onViewThemes }) => {
   const { eventsData, loggedInUser } = useApp();
   const ref = useRef();
 
@@ -57,11 +57,11 @@ const Events = ({ onReserve }) => {
         <div className="events-grid" ref={ref}>
           {eventsData.filter(e => e.status === "active").map((e, index) => (
             <div key={index} className="event-card reveal">
-              <div className="event-card-img-wrap" onClick={() => handleReserve(e)}>
+              <div className="event-card-img-wrap" onClick={() => onViewThemes(e)}>
                 <img className="event-card-img" src={e.img} loading="lazy" alt={e.name}
                   onError={ev => ev.target.src = "https://i.pinimg.com/736x/e4/2b/55/e42b5578b225b29e8b65010a975a2d1e.jpg"} />
                 {getBadge(e.name)}
-                <div className="img-overlay-hint">Review Details</div>
+                <div className="img-overlay-hint">View Gallery</div>
               </div>
               <div className="event-card-body">
                 <div className="event-card-info">
@@ -69,9 +69,14 @@ const Events = ({ onReserve }) => {
                   <span className="event-card-price">From {getStartingPrice(e.name)}</span>
                 </div>
                 <div className="event-card-name">{e.name}</div>
-                <button className="event-card-btn" onClick={() => handleReserve(e)}>
-                  Reserve Now
-                </button>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "15px" }}>
+                  <button className="event-card-btn" onClick={() => handleReserve(e)} style={{ margin: 0 }}>
+                    Reserve
+                  </button>
+                  <button className="event-card-btn outline" onClick={() => onViewThemes(e)} style={{ margin: 0, background: "transparent", border: "1px solid var(--gold)", color: "var(--gold)" }}>
+                    Themes
+                  </button>
+                </div>
               </div>
             </div>
           ))}
