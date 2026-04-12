@@ -28,6 +28,10 @@ def repair():
     # 2. Write files
     for f_path, encoded_content in FILES.items():
         print(f"📄 Restoring: {f_path}...")
+        encoded_content = encoded_content.strip()
+        padding = 4 - (len(encoded_content) % 4)
+        if padding != 4:
+            encoded_content += "=" * padding
         with open(f_path, "wb") as f:
             f.write(base64.b64decode(encoded_content))
             
