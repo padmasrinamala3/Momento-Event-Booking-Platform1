@@ -1848,7 +1848,7 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
       remainingBalance: balance,
       status: "pending",
       payMode: payMode === "advance" ? "30% Advance + 70% Balance" : payMode === "emi" ? `30% Adv + EMI ₹${emi.toLocaleString("en-IN")}×3` : "Full Payment",
-      userEmail: loggedInUser.email,
+      userEmail: loggedInUser ? loggedInUser.email : "",
       shift: shift,
       foodType: foodType
     };

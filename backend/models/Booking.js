@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bookingSchema = new mongoose.Schema({
   bookingId: { type: String, unique: true }, // Custom booking ID like BK227594
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  userEmail: { type: String },
   name:     { type: String, required: true },
   phone:    { type: String, required: true },
   event:    { type: String, required: true },
