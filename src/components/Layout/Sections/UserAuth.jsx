@@ -25,6 +25,23 @@ const UserAuth = ({ onOpenInvoice }) => {
     }
   };
 
+  const cancelBooking = async (id) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" })
+      });
+      if (!res.ok) throw new Error("Failed to cancel booking");
+      showToast("Booking cancelled successfully", "success");
+      loadBookings(); // Refresh the list
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to cancel booking", "error");
+    }
+  };
+
   const login = async () => {
     if (!form.email || !form.password) { setError("✗ Email and password required"); return; }
     setLoading(true);
@@ -126,6 +143,16 @@ const UserAuth = ({ onOpenInvoice }) => {
                     <div className="bc-price">₹{typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}</div>
                     <div className="bc-actions">
                       <button className="btn-invoice" onClick={() => onOpenInvoice(b.id)}>📄 Invoice</button>
+                      {b.status !== "cancelled" && (
+                        <button 
+                          style={{ marginLeft: 10, background: "rgba(224,90,90,0.1)", border: "1px solid #e05a5a", color: "#e05a5a", padding: "6px 12px", borderRadius: "5px", cursor: "pointer", fontSize: 12, transition: "0.2s" }}
+                          onClick={() => cancelBooking(b.id || b._id)}
+                          onMouseOver={(e) => { e.target.style.background = "#e05a5a"; e.target.style.color = "#fff"; }}
+                          onMouseOut={(e) => { e.target.style.background = "rgba(224,90,90,0.1)"; e.target.style.color = "#e05a5a"; }}
+                        >
+                          ❌ Cancel Booking
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
