@@ -730,6 +730,21 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
     { name: "Guest Explorer", email: "guest@moment-o.com", avatar: "G" }
   ];
 
+  const cancelBooking = (id) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    fetch(`${API}/bookings/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "cancelled" })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to cancel");
+        showToast("Booking cancelled successfully", "success");
+        setTimeout(() => window.location.reload(), 1500);
+      })
+      .catch(err => showToast("Error: " + err.message, "error"));
+  };
+
   const finalizeGoogleLogin = (acc) => {
     setShowGoogleMock(false);
     showToast(`? Authorizing with Google...`, "processing");
@@ -854,6 +869,16 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
                       <div className="dbc-status-wrap">
                         {badge(b.status)}
                         <button className="btn-invoice-dash" onClick={() => onOpenInvoice(b.id)}>View Invoice</button>
+                        {b.status !== "cancelled" && (
+                          <button 
+                            style={{ background: "rgba(224,90,90,0.1)", border: "1px solid #e05a5a", color: "#e05a5a", padding: "8px 14px", borderRadius: "8px", cursor: "pointer", fontSize: 13, transition: "0.2s" }}
+                            onClick={() => cancelBooking(b.id || b._id)}
+                            onMouseOver={(e) => { e.target.style.background = "#e05a5a"; e.target.style.color = "#fff"; }}
+                            onMouseOut={(e) => { e.target.style.background = "rgba(224,90,90,0.1)"; e.target.style.color = "#e05a5a"; }}
+                          >
+                            ❌ Cancel
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
