@@ -1719,7 +1719,7 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
               ) : (
                 <div style={{ animation: "fadeIn 0.3s ease" }}>
                   <div style={{ width: 150, height: 150, background: "#fff", margin: "0 auto 20px", padding: 10, borderRadius: 10, overflow: "hidden" }}>
-                    <img src="./assets/payment_qr.png" alt="Payment QR" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    <img src="/assets/payment_qr.png" alt="Payment QR" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                   </div>
                   <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 20 }}>Scan this QR using any UPI App to pay.</div>
                 </div>
