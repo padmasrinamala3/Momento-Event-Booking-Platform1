@@ -1605,6 +1605,7 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
   const [method, setMethod] = useState("upi");
+  const [transactionId, setTransactionId] = useState("");
 
   const fireConfetti = () => {
     for (let i = 0; i < 70; i++) {
@@ -1643,6 +1644,10 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
   };
 
   const handlePayment = () => {
+    if (!transactionId || transactionId.trim().length < 5) {
+      showToast("⚠ Please enter a valid Transaction ID / UTR", "processing");
+      return;
+    }
     setProcessing(true);
     setTimeout(() => {
       setProcessing(false);
@@ -1655,9 +1660,14 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
     }, 2500);
   };
 
+  const copyUpi = () => {
+    navigator.clipboard.writeText("momento.events@upi");
+    showToast("📋 UPI ID Copied!", "confirmed");
+  };
+
   return (
     <div className="modal-overlay open" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 380, textAlign: "center", padding: "40px 20px", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 380 }}>
+      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: "center", padding: "40px 20px", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 450 }}>
 
         {success ? (
           <div style={{ animation: "popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards" }}>
@@ -1671,23 +1681,71 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
           <div style={{ padding: "30px 0" }}>
             <div className="loading-spinner" style={{ margin: "0 auto 20px", display: "inline-block", width: 40, height: 40, border: "3px solid rgba(201,168,76,0.2)", borderRadius: "50%", borderTopColor: "var(--gold)", animation: "spin 1s ease-in-out infinite" }}></div>
             <div style={{ color: "var(--gold)", fontSize: 13, letterSpacing: 2, fontWeight: "bold" }}>PROCESSING...</div>
-            <div style={{ fontSize: 11, color: "#888", marginTop: 8 }}>Please do not refresh or close.</div>
+            <div style={{ fontSize: 11, color: "#888", marginTop: 8 }}>Verifying your transaction ID. Please wait.</div>
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </div>
         ) : (
           <div>
             <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "var(--gold)", marginBottom: 10, fontSize: 32 }}>Secure Payment</h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 30 }}>Complete your booking securely via our payment gateway.</p>
-            <div style={{ fontSize: 42, fontWeight: "bold", color: "#fff", marginBottom: 30 }}>₹{amount.toLocaleString("en-IN")}</div>
-            <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-              <button onClick={() => setMethod("upi")} style={{ flex: 1, padding: "10px", background: method === "upi" ? "rgba(201,168,76,0.1)" : "transparent", border: method === "upi" ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: method === "upi" ? "var(--gold)" : "#888", cursor: "pointer", transition: "0.2s" }}>UPI / QR</button>
-              <button onClick={() => setMethod("card")} style={{ flex: 1, padding: "10px", background: method === "card" ? "rgba(201,168,76,0.1)" : "transparent", border: method === "card" ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: method === "card" ? "var(--gold)" : "#888", cursor: "pointer", transition: "0.2s" }}>Card / Net</button>
+            <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 20 }}>Complete your booking securely.</p>
+            <div style={{ fontSize: 36, fontWeight: "bold", color: "#fff", marginBottom: 25 }}>₹{amount.toLocaleString("en-IN")}</div>
+            
+            <div style={{ display: "flex", gap: 10, marginBottom: 25 }}>
+              <button 
+                onClick={() => setMethod("upi")} 
+                style={{ flex: 1, padding: "12px", background: method === "upi" ? "rgba(201,168,76,0.1)" : "transparent", border: method === "upi" ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: method === "upi" ? "var(--gold)" : "#888", cursor: "pointer", transition: "0.2s", fontSize: 12, fontWeight: 600 }}
+              >
+                UPI PAYMENT
+              </button>
+              <button 
+                onClick={() => setMethod("qr")} 
+                style={{ flex: 1, padding: "12px", background: method === "qr" ? "rgba(201,168,76,0.1)" : "transparent", border: method === "qr" ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: method === "qr" ? "var(--gold)" : "#888", cursor: "pointer", transition: "0.2s", fontSize: 12, fontWeight: 600 }}
+              >
+                QR SCAN
+              </button>
             </div>
+
+            <div style={{ minHeight: 180 }}>
+              {method === "upi" ? (
+                <div style={{ animation: "fadeIn 0.3s ease" }}>
+                  <div style={{ padding: "15px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px dashed rgba(201,168,76,0.3)", marginBottom: 20 }}>
+                    <div style={{ fontSize: 10, color: "var(--gold)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Pay to UPI ID</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                      <span style={{ fontSize: 16, color: "#fff", fontWeight: 500 }}>momento.events@upi</span>
+                      <button onClick={copyUpi} style={{ background: "transparent", border: "none", color: "var(--gold)", cursor: "pointer", fontSize: 14 }}>📋</button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ animation: "fadeIn 0.3s ease" }}>
+                  <div style={{ width: 150, height: 150, background: "#fff", margin: "0 auto 20px", padding: 10, borderRadius: 10, overflow: "hidden" }}>
+                    <img src="./assets/payment_qr.png" alt="Payment QR" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 20 }}>Scan this QR using any UPI App to pay.</div>
+                </div>
+              )}
+
+              <div style={{ textAlign: "left", marginBottom: 20 }}>
+                <label style={{ fontSize: 10, color: "var(--gold)", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 8 }}>Transaction ID / UTR Number</label>
+                <input 
+                  type="text" 
+                  placeholder="Enter 12-digit Ref No."
+                  value={transactionId}
+                  onChange={e => setTransactionId(e.target.value)}
+                  style={{ width: "100%", padding: "12px 15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                />
+                <p style={{ fontSize: 9, color: "#888", marginTop: 6 }}>* Find this in your payment confirmation screen / SMS.</p>
+              </div>
+            </div>
+
             <button className="btn-primary" style={{ width: "100%", marginBottom: 15 }} onClick={handlePayment}>Pay Now</button>
             <div className="policy-notice" style={{ marginTop: 15, padding: "10px", borderRadius: 6, background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "var(--text-muted)", fontSize: 11, textAlign: "center" }}>🔒 100% Safe & Secure Payments</div>
           </div>
         )}
       </div>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
     </div>
   );
 }

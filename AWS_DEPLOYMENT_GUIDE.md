@@ -61,9 +61,39 @@ Your backend needs permission to talk to Atlas from the AWS cloud.
 
 ---
 
+## 🏎️ Phase 4: Advanced EC2 Deployment (Alternative)
+
+If you want more control, higher performance, and a single URL for both Frontend and Backend, use an **EC2 Instance (Ubuntu)**.
+
+### 1. Launch Instance
+1.  Go to [EC2 Console](https://console.aws.amazon.com/ec2).
+2.  **Launch Instance**: 
+    *   **AMI**: Ubuntu 22.04 LTS.
+    *   **Instance Type**: `t2.micro` (Free Tier) or `t3.small`.
+    *   **Security Groups**: Allow **HTTP (80)**, **HTTPS (443)**, and **SSH (22)**.
+
+### 2. Connect & Deploy
+Connect to your instance via SSH and run these commands:
+
+```bash
+# Clone your repository
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+
+# Make the deployment script executable and run it
+chmod +x deploy_ec2.sh
+./deploy_ec2.sh
+```
+
+### 3. Key Files Explained
+-   **`deploy_ec2.sh`**: Automatically installs Node.js, Nginx, and PM2. It builds your React app and starts the backend service.
+-   **`momento_nginx.conf`**: Configures Nginx to serve the React `build` folder at the root (`/`) and proxy API requests to the backend (`/api`).
+
+---
+
 ## ✅ Final Verification
 
-1.  Open your **AWS Amplify URL**.
+1.  Open your **AWS Amplify URL** or your **EC2 Public IP**.
 2.  Go to the "Contact" or "Login" section.
 3.  Try to sign in or send a review.
 4.  If everything works, your project is officially live on AWS! 🎉
@@ -71,4 +101,7 @@ Your backend needs permission to talk to Atlas from the AWS cloud.
 ---
 
 ### Need Help? 
-If you run into any "Network Error" messages, check the **CloudWatch Logs** in your App Runner service to see the backend error messages.
+If you run into any "Network Error" messages:
+- **For App Runner**: Check the **CloudWatch Logs** in your service.
+- **For EC2**: Run `pm2 logs momento-backend` to see the backend errors, or `sudo tail -f /var/log/nginx/error.log` for web server issues.
+
