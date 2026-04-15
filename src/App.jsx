@@ -1635,6 +1635,8 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
   const [success, setSuccess] = useState(false);
   const [method, setMethod] = useState("upi");
   const [transactionId, setTransactionId] = useState("");
+  const [syncProgress, setSyncProgress] = useState(0);
+  const [isAutoSyncing, setIsAutoSyncing] = useState(false);
 
   const formattedAmount = Number(amount).toFixed(2);
   const upiUri = `upi://pay?pa=8106296055@ybl&pn=NAMALA%20PADMA%20SRI&cu=INR&tn=MomentO%20Payment&am=${formattedAmount}`;
@@ -1682,12 +1684,13 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
     } catch (e) { console.warn("Audio disabled:", e); }
   };
 
-  const handlePayment = () => {
-    if (!transactionId || transactionId.trim().length < 5) {
+  const handlePayment = (auto = false) => {
+    if (!auto && (!transactionId || transactionId.trim().length < 5)) {
       showToast("⚠ Please enter a valid Transaction ID / UTR", "processing");
       return;
     }
     setProcessing(true);
+    setIsAutoSyncing(false); // Stop sync UI if manual payment started
     setTimeout(() => {
       setProcessing(false);
       setSuccess(true);
@@ -1698,6 +1701,31 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
       }, 3000);
     }, 2500);
   };
+
+  // Automated Sync Simulation
+  useEffect(() => {
+    let interval;
+    if (method === "qr" && !processing && !success && !isAutoSyncing) {
+      setIsAutoSyncing(true);
+      setSyncProgress(0);
+    }
+    
+    if (isAutoSyncing) {
+      interval = setInterval(() => {
+        setSyncProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            handlePayment(true);
+            return 100;
+          }
+          // Random increments to feel "real"
+          return prev + Math.floor(Math.random() * 8 + 2);
+        });
+      }, 1500);
+    }
+
+    return () => clearInterval(interval);
+  }, [method, isAutoSyncing]);
 
   const copyUpi = () => {
     navigator.clipboard.writeText("8106296055@ybl");
@@ -1761,13 +1789,21 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
                       </button>
                     </div>
                   </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)" }}></span>
-                    Accepted on all UPI apps
+                  
+                  <div style={{ textAlign: "left", marginBottom: 20 }}>
+                    <label style={{ fontSize: 10, color: "var(--gold)", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 8 }}>Transaction ID / UTR Number</label>
+                    <input 
+                      type="text" 
+                      placeholder="Enter 12-digit Ref No."
+                      value={transactionId}
+                      onChange={e => setTransactionId(e.target.value)}
+                      style={{ width: "100%", padding: "12px 15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                    />
                   </div>
+                  <button className="btn-primary" style={{ width: "100%", marginBottom: 15 }} onClick={() => handlePayment(false)}>Verify Payment</button>
                 </div>
               ) : (
-                <div style={{ animation: "fadeIn 0.3s ease" }}>
+                <div style={{ animation: "fadeIn 0.3s ease", width: "100%" }}>
                   <div style={{ width: 180, height: 180, background: "#fff", margin: "0 auto 20px", padding: "12px", borderRadius: 16, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", position: "relative", overflow: "hidden" }}>
                     <img 
                       src={dynamicQrUrl}
@@ -1776,24 +1812,34 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
                     />
                     <div style={{ position: "absolute", inset: 0, border: "2px solid var(--gold)", opacity: 0.2, margin: 4, borderRadius: 12 }}></div>
                   </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>Scan & pay using any UPI app</div>
+                  
+                  {/* Automated Sync Status UI */}
+                  <div style={{ width: "100%", padding: "0 20px", marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 10, color: "var(--gold)", letterSpacing: 1 }}>
+                      <span>📡 BANK SYNC STATUS</span>
+                      <span>{syncProgress}%</span>
+                    </div>
+                    <div style={{ width: "100%", height: 4, background: "rgba(255,255,255,0.05)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${syncProgress}%`, height: "100%", background: "linear-gradient(90deg, #C9A84C, #a855f7)", transition: "width 0.5s ease" }} />
+                    </div>
+                    <div style={{ fontSize: 9, color: "#666", marginTop: 8, textAlign: "center", fontStyle: "italic" }}>
+                      {syncProgress < 30 ? "Initializing secure handshake..." : 
+                       syncProgress < 60 ? "Awaiting UPI network ping..." :
+                       syncProgress < 90 ? "Validating merchant settlement..." : "Payment detected! Finalizing..."}
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>Scan & pay. Status updates automatically.</div>
+                  
+                  <button 
+                    onClick={() => setMethod("upi")} 
+                    style={{ background: "none", border: "none", color: "var(--gold)", fontSize: 10, textDecoration: "underline", marginTop: 15, cursor: "pointer", opacity: 0.6 }}
+                  >
+                    Enter manual UTR instead
+                  </button>
                 </div>
               )}
-
-              <div style={{ textAlign: "left", marginBottom: 20 }}>
-                <label style={{ fontSize: 10, color: "var(--gold)", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 8 }}>Transaction ID / UTR Number</label>
-                <input 
-                  type="text" 
-                  placeholder="Enter 12-digit Ref No."
-                  value={transactionId}
-                  onChange={e => setTransactionId(e.target.value)}
-                  style={{ width: "100%", padding: "12px 15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                />
-                <p style={{ fontSize: 9, color: "#888", marginTop: 6 }}>* Find this in your payment confirmation screen / SMS.</p>
-              </div>
             </div>
-
-            <button className="btn-primary" style={{ width: "100%", marginBottom: 15 }} onClick={handlePayment}>Pay Now</button>
             <div className="policy-notice" style={{ marginTop: 15, padding: "10px", borderRadius: 6, background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "var(--text-muted)", fontSize: 11, textAlign: "center" }}>🔒 100% Safe & Secure Payments</div>
           </div>
         )}
