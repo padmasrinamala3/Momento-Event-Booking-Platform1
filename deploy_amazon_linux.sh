@@ -12,6 +12,16 @@ echo "🚀 Starting MomentO Automated Deployment for Amazon Linux..."
 echo "🔄 Updating system packages..."
 sudo dnf update -y
 
+# 1.1 Create Swap File (To prevent memory crashes during build)
+if [ ! -f /swapfile ]; then
+    echo "🧠 Creating 1GB Swap File..."
+    sudo dd if=/dev/zero of=/swapfile bs=1M count=1024
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
+fi
+
 # 2. Install Nginx & Git
 echo "📦 Installing Nginx and Git..."
 sudo dnf install -y nginx git
@@ -43,7 +53,17 @@ sudo chown -R $USER:$USER $APP_DIR
 cd $APP_DIR
 echo "🏗️ Installing frontend dependencies and building..."
 npm install
+
+# Use memory-safe build command
+echo "🚀 Building with memory optimization..."
+export NODE_OPTIONS=--max-old-space-size=1024
 npm run build
+
+# Verification after build
+if [ ! -f build/index.html ]; then
+    echo "❌ ERROR: build/index.html was not created! Build failed."
+    exit 1
+fi
 
 # 8. Setup Backend
 cd $APP_DIR/backend
