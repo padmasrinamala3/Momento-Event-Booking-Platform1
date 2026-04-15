@@ -1640,13 +1640,19 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
   const dynamicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=${encodeURIComponent(upiUri)}`;
 
   const fireConfetti = () => {
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 120; i++) {
       const conf = document.createElement('div');
       conf.className = 'confetti-piece';
       conf.style.left = Math.random() * 100 + 'vw';
+      conf.style.top = '-10px';
+      conf.style.width = (Math.random() * 8 + 4) + 'px';
+      conf.style.height = (Math.random() * 8 + 4) + 'px';
       conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
-      conf.style.animationDelay = Math.random() * 0.5 + 's';
-      conf.style.backgroundColor = ['#c9a84c', '#4caf82', '#a855f7', '#3b82f6', '#ec4899'][Math.floor(Math.random() * 5)];
+      conf.style.animationDelay = Math.random() * 0.8 + 's';
+      conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      conf.style.backgroundColor = ['#C9A84C', '#4caf82', '#a855f7', '#3b82f6', '#ec4899', '#ffffff'][Math.floor(Math.random() * 6)];
+      conf.style.zIndex = '100000';
+      conf.style.position = 'fixed';
       document.body.appendChild(conf);
       setTimeout(() => conf.remove(), 4000);
     }
@@ -1702,12 +1708,17 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
       <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: "center", padding: "40px 20px", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 450 }}>
 
         {success ? (
-          <div style={{ animation: "popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards" }}>
-            <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(76,175,130,0.15)", border: "2px solid #4caf82", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-              <svg fill="none" stroke="#4caf82" strokeWidth="4" viewBox="0 0 24 24" style={{ width: 40, height: 40, strokeDasharray: 50, strokeDashoffset: 50, animation: "drawCheck 0.4s ease forwards 0.2s" }}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>
+          <div style={{ animation: "popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards", padding: "40px 0" }}>
+            <div className="success-checkmark" style={{ width: 100, height: 100, margin: "0 auto 30px", position: "relative" }}>
+              <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "rgba(76,175,130,0.1)", border: "2px solid #4caf82", animation: "pulseRing 1.5s infinite" }} />
+              <svg fill="none" stroke="#4caf82" strokeWidth="4" viewBox="0 0 24 24" style={{ width: 60, height: 60, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", strokeDasharray: 50, strokeDashoffset: 50, animation: "drawCheck 0.6s ease forwards 0.3s" }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
             </div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "#4caf82", marginBottom: 10, fontSize: 30 }}>Payment Successful!</h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Generating your booking invoice...</p>
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "#4caf82", marginBottom: 15, fontSize: 34, letterSpacing: 1 }}>Transaction Verified</h2>
+            <div style={{ height: 20 }}>
+              <p style={{ color: "var(--text-muted)", fontSize: 13, animation: "fadeInOut 3s forwards" }}>Booking confirmed. Redirecting to invoice...</p>
+            </div>
           </div>
         ) : processing ? (
           <div style={{ padding: "30px 0" }}>
@@ -1788,6 +1799,10 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
       </div>
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes pulseRing { 0% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1); opacity: 0.2; } 100% { transform: scale(0.95); opacity: 0.5; } }
+        @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
       `}</style>
     </div>
   );
