@@ -1759,7 +1759,7 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
                       style={{ width: "100%", height: "100%", objectFit: "contain" }} 
                       onError={(e) => { 
                         e.target.onerror = null; 
-                        e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=upi%3A%2F%2Fpay%3Fpa%3D8106296055%40ybl%26pn%3DMomentO%26cu%3DINR"; 
+                        e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=upi%3A%2F%2Fpay%3Fpa%3D8106296055%40ybl%26pn%3DNAMALA%2520PADMA%2520SRI%26cu%3DINR%26tn%3DMomentO%2520Payment"; 
                       }} 
                     />
                     <div style={{ position: "absolute", inset: 0, border: "2px solid var(--gold)", opacity: 0.2, margin: 4, borderRadius: 12 }}></div>
