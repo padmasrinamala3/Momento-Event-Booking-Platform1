@@ -35,7 +35,9 @@ sudo chown -R $USER:$USER $APP_DIR
 
 # 6. Sync Project Files
 echo "🚚 Syncing files to $APP_DIR..."
-cp -r . $APP_DIR/
+sudo dnf install -y rsync
+sudo rsync -av --exclude='.git' --exclude='node_modules' --exclude='build' . $APP_DIR/
+sudo chown -R $USER:$USER $APP_DIR
 
 # 7. Build Frontend
 cd $APP_DIR
