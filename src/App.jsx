@@ -1689,7 +1689,7 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
   };
 
   const copyUpi = () => {
-    navigator.clipboard.writeText("momento.events@upi");
+    navigator.clipboard.writeText("8106296055@ybl");
     showToast("📋 UPI ID Copied!", "confirmed");
   };
 
@@ -1733,21 +1733,27 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
               </button>
             </div>
 
-            <div style={{ minHeight: 180 }}>
+            <div style={{ minHeight: 250, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               {method === "upi" ? (
-                <div style={{ animation: "fadeIn 0.3s ease" }}>
-                  <div style={{ padding: "15px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px dashed rgba(201,168,76,0.3)", marginBottom: 20 }}>
-                    <div style={{ fontSize: 10, color: "var(--gold)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Pay to UPI ID</div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                      <span style={{ fontSize: 16, color: "#fff", fontWeight: 500 }}>momento.events@upi</span>
-                      <button onClick={copyUpi} style={{ background: "transparent", border: "none", color: "var(--gold)", cursor: "pointer", fontSize: 14 }}>📋</button>
+                <div style={{ animation: "fadeIn 0.3s ease", width: "100%" }}>
+                  <div style={{ padding: "20px", background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px dashed rgba(201,168,76,0.3)", marginBottom: 20, backdropFilter: "blur(10px)" }}>
+                    <div style={{ fontSize: 10, color: "var(--gold)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Pay to UPI ID</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+                      <span style={{ fontSize: 18, color: "#fff", fontWeight: 600, letterSpacing: 1 }}>8106296055@ybl</span>
+                      <button onClick={copyUpi} style={{ background: "rgba(201,168,76,0.1)", border: "none", color: "var(--gold)", cursor: "pointer", fontSize: 18, padding: "5px", borderRadius: "5px", display: "flex", alignItems: "center" }} title="Copy UPI ID">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      </button>
                     </div>
+                  </div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)" }}></span>
+                    Accepted on all UPI apps
                   </div>
                 </div>
               ) : (
                 <div style={{ animation: "fadeIn 0.3s ease" }}>
                   <div style={{ width: 150, height: 150, background: "#fff", margin: "0 auto 20px", padding: 10, borderRadius: 10, overflow: "hidden" }}>
-                    <img src="/assets/payment_qr.png?v=3" alt="Payment QR" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    <img src="/assets/phonepe_qr.png" alt="PhonePe QR - NAMALA PADMA SRI" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                   </div>
                   <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 20 }}>Scan this QR using any UPI App to pay.</div>
                 </div>
