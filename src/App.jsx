@@ -1635,6 +1635,10 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
   const [method, setMethod] = useState("upi");
   const [transactionId, setTransactionId] = useState("");
 
+  const formattedAmount = Number(amount).toFixed(2);
+  const upiUri = `upi://pay?pa=8106296055@ybl&pn=NAMALA%20PADMA%20SRI&cu=INR&tn=MomentO%20Payment&am=${formattedAmount}`;
+  const dynamicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=${encodeURIComponent(upiUri)}`;
+
   const fireConfetti = () => {
     for (let i = 0; i < 70; i++) {
       const conf = document.createElement('div');
@@ -1754,13 +1758,9 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
                 <div style={{ animation: "fadeIn 0.3s ease" }}>
                   <div style={{ width: 180, height: 180, background: "#fff", margin: "0 auto 20px", padding: "12px", borderRadius: 16, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", position: "relative", overflow: "hidden" }}>
                     <img 
-                      src="/assets/payment_qr.png" 
+                      src={dynamicQrUrl}
                       alt="MomentO UPI QR" 
                       style={{ width: "100%", height: "100%", objectFit: "contain" }} 
-                      onError={(e) => { 
-                        e.target.onerror = null; 
-                        e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=upi%3A%2F%2Fpay%3Fpa%3D8106296055%40ybl%26pn%3DNAMALA%2520PADMA%2520SRI%26cu%3DINR%26tn%3DMomentO%2520Payment"; 
-                      }} 
                     />
                     <div style={{ position: "absolute", inset: 0, border: "2px solid var(--gold)", opacity: 0.2, margin: 4, borderRadius: 12 }}></div>
                   </div>
