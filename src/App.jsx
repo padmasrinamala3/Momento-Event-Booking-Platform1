@@ -1752,10 +1752,19 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
                 </div>
               ) : (
                 <div style={{ animation: "fadeIn 0.3s ease" }}>
-                  <div style={{ width: 150, height: 150, background: "#fff", margin: "0 auto 20px", padding: 10, borderRadius: 10, overflow: "hidden" }}>
-                    <img src="/assets/phonepe_qr.png" alt="PhonePe QR - NAMALA PADMA SRI" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  <div style={{ width: 180, height: 180, background: "#fff", margin: "0 auto 20px", padding: "12px", borderRadius: 16, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", position: "relative", overflow: "hidden" }}>
+                    <img 
+                      src="/assets/payment_qr.png" 
+                      alt="MomentO UPI QR" 
+                      style={{ width: "100%", height: "100%", objectFit: "contain" }} 
+                      onError={(e) => { 
+                        e.target.onerror = null; 
+                        e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=upi%3A%2F%2Fpay%3Fpa%3D8106296055%40ybl%26pn%3DMomentO%26cu%3DINR"; 
+                      }} 
+                    />
+                    <div style={{ position: "absolute", inset: 0, border: "2px solid var(--gold)", opacity: 0.2, margin: 4, borderRadius: 12 }}></div>
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 20 }}>Scan this QR using any UPI App to pay.</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>Scan & pay using any UPI app</div>
                 </div>
               )}
 
