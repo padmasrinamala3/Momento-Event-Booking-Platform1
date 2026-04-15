@@ -679,6 +679,7 @@ function Pricing({ onBookPkg }) {
     { name: "Basic", price: "₹15,000", num: 15000, sub: "Perfect for small gatherings", emi: "₹5,000", features: ["Basic Decoration", "Photography (4 hrs)", "Catering (50 persons)", "Event Coordinator"] },
     { name: "Premium", price: "₹35,000", num: 35000, sub: "Best value for celebrations", emi: "₹11,667", popular: true, features: ["Flower & Stage Decoration", "Photography + Video", "Catering (100 persons)", "DJ / Music (3 hrs)", "Dedicated Coordinator"] },
     { name: "Royal", price: "₹75,000", num: 75000, sub: "Ultimate luxury experience", emi: "₹25,000", features: ["Full Stage & Floral Decoration", "Photography + Drone Video", "Catering (200 persons)", "DJ Night (6 hrs)", "Mehendi + Makeup Artist", "VIP Coordinator"] },
+    { name: "Test Demo", price: "₹1", num: 1, sub: "Verify payment system", emi: "₹1", features: ["Test SVG Tick", "Test Dynamic QR", "Instant Verification"] },
   ];
   return (
     <section id="pricing" className="pricing-section section-reveal" ref={revealRef}>
