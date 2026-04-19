@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import "./App.css";
 import { useApp } from "./context/AppContext";
-import { eventsDataDefault, eventServices, cateringMenus, WHATSAPP } from "./data/constants";
+import { eventsDataDefault, eventServices, categorizedMenus, WHATSAPP } from "./data/constants";
 
-const API = `${window.location.origin}/api`;
+const API = process.env.REACT_APP_API_URL || "/api";
 
 // ── TOAST ──
 let _setToasts = null;
@@ -386,10 +386,18 @@ function EventCostCalculator() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {(() => {
-                let tier = "Silver";
-                if (activeMenu.toLowerCase().includes("gold")) tier = "Gold";
-                if (activeMenu.toLowerCase().includes("platinum") || activeMenu.toLowerCase().includes("royal")) tier = "Platinum";
-                return cateringMenus[tier][foodType].map((item, idx) => (
+                let category = "buffet";
+                const sName = activeMenu.toLowerCase();
+                const eName = eventType.toLowerCase();
+
+                if (sName.includes("high tea") || sName.includes("cookies")) category = "high_tea";
+                else if (sName.includes("lunch box")) category = "lunch_box";
+                else if (sName.includes("youth") || sName.includes("snack") || sName.includes("fast food") || 
+                         eName.includes("fest") || eName.includes("concert") || eName.includes("farewell")) category = "youth";
+
+                const menu = categorizedMenus[category][foodType];
+                
+                return menu.map((item, idx) => (
                   <div key={idx} style={{ fontSize: 12, color: "#aaa", display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ color: "var(--gold)", fontSize: 8 }}>✦</span> {item.replace(/🥬 |🍗 /, "")}
                   </div>
@@ -679,7 +687,6 @@ function Pricing({ onBookPkg }) {
     { name: "Basic", price: "₹15,000", num: 15000, sub: "Perfect for small gatherings", emi: "₹5,000", features: ["Basic Decoration", "Photography (4 hrs)", "Catering (50 persons)", "Event Coordinator"] },
     { name: "Premium", price: "₹35,000", num: 35000, sub: "Best value for celebrations", emi: "₹11,667", popular: true, features: ["Flower & Stage Decoration", "Photography + Video", "Catering (100 persons)", "DJ / Music (3 hrs)", "Dedicated Coordinator"] },
     { name: "Royal", price: "₹75,000", num: 75000, sub: "Ultimate luxury experience", emi: "₹25,000", features: ["Full Stage & Floral Decoration", "Photography + Drone Video", "Catering (200 persons)", "DJ Night (6 hrs)", "Mehendi + Makeup Artist", "VIP Coordinator"] },
-    { name: "Test Demo", price: "₹1", num: 1, sub: "Verify payment system", emi: "₹1", features: ["Test SVG Tick", "Test Dynamic QR", "Instant Verification"] },
   ];
   return (
     <section id="pricing" className="pricing-section section-reveal" ref={revealRef}>
@@ -800,16 +807,16 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
   };
 
   const forgotPassword = () => {
-    if (!form.email) { setError("✗ Please enter your email"); return; }
+    if (!form.email || !form.password) { setError("✗ Please enter your email and a new password"); return; }
     setError("");
     fetch(`${API}/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: form.email })
+      body: JSON.stringify({ email: form.email, newPassword: form.password })
     })
       .then(r => r.json())
       .then(data => {
-        if (data.message === "Email not found in our records" || data.message === "Email is required") {
+        if (data.message === "Email not found in our records" || data.message === "Email and new password are required") {
           setError("✗ " + data.message);
           return;
         }
@@ -976,16 +983,23 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
 
               {tab === "forgot" && <>
                 <h3>◈ Access Recovery</h3>
-                <p style={{ fontSize: 13, color: "var(--text-muted)", textAlign: "center", marginBottom: 25, lineHeight: 1.6 }}>Enter your registered email and we'll send a luxury-themed recovery link.</p>
+                <p style={{ fontSize: 13, color: "var(--text-muted)", textAlign: "center", marginBottom: 25, lineHeight: 1.6 }}>Enter your email and a <strong>new password</strong> to reset your account access.</p>
                 <div className="auth-input-group">
-                  <label>Recovery Email</label>
+                  <label>Registered Email</label>
                   <div className="auth-input-wrapper">
                     <span className="auth-input-icon">✉</span>
-                    <input className="auth-input-premium" type="email" placeholder="your@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} onKeyDown={e => e.key === "Enter" && forgotPassword()} />
+                    <input className="auth-input-premium" type="email" placeholder="your@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                  </div>
+                </div>
+                <div className="auth-input-group">
+                  <label>New Password</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon">🔒</span>
+                    <input className="auth-input-premium" type="password" placeholder="••••••••" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} onKeyDown={e => e.key === "Enter" && forgotPassword()} />
                   </div>
                 </div>
                 {error && <div className="auth-error show" style={{ marginBottom: 15 }}>{error}</div>}
-                <button className="auth-btn-submit" onClick={forgotPassword}>Send Recovery Email</button>
+                <button className="auth-btn-submit" onClick={forgotPassword}>Reset Password & Login</button>
                 <div style={{ textAlign: "center", marginTop: 20, fontSize: 12 }}>
                    <span style={{ color: "var(--text-muted)", cursor: "pointer" }} onClick={() => setTab("login")}>← Back to Login</span>
                 </div>
@@ -1630,17 +1644,12 @@ function ThemeGalleryModal({ event, onClose, onBookWithTheme }) {
 }
 
 // ── PAYMENT GATEWAY MOCK ──
-function PaymentGatewayModal({ amount, onPay, onClose }) {
+function PaymentGatewayModal({ amount, bookingData, onPay, onClose }) {
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [method, setMethod] = useState("upi");
-  const [transactionId, setTransactionId] = useState("");
-  const [syncProgress, setSyncProgress] = useState(0);
-  const [isAutoSyncing, setIsAutoSyncing] = useState(false);
+  const [error, setError] = useState("");
 
   const formattedAmount = Number(amount).toFixed(2);
-  const upiUri = `upi://pay?pa=8106296055@ybl&pn=NAMALA%20PADMA%20SRI&cu=INR&tn=MomentO%20Payment&am=${formattedAmount}`;
-  const dynamicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=${encodeURIComponent(upiUri)}`;
 
   const fireConfetti = () => {
     for (let i = 0; i < 120; i++) {
@@ -1684,165 +1693,186 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
     } catch (e) { console.warn("Audio disabled:", e); }
   };
 
-  const handlePayment = (auto = false) => {
-    if (!auto && (!transactionId || transactionId.trim().length < 5)) {
-      showToast("⚠ Please enter a valid Transaction ID / UTR", "processing");
-      return;
-    }
+  const [method, setMethod] = useState("upi"); // 'online' or 'upi'
+  const [txnId, setTxnId] = useState("");
+
+  const upiLink = `upi://pay?pa=8106296055@ybl&pn=NAMALA%20PADMA%20SRI&am=${amount}&cu=INR&tn=Booking%20for%20${encodeURIComponent(bookingData.event || "Event")}`;
+  const dynamicQR = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(upiLink)}`;
+
+  const handleRazorpaySuccess = async (response) => {
     setProcessing(true);
-    setIsAutoSyncing(false); // Stop sync UI if manual payment started
-    setTimeout(() => {
+    try {
+      const res = await fetch(`${API}/payment/verify-payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...response,
+          bookingId: bookingData.id
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setProcessing(false);
+        setSuccess(true);
+        fireConfetti();
+        playSuccessSound();
+        setTimeout(() => onPay(), 3000);
+      } else {
+        throw new Error(data.message || "Verification failed");
+      }
+    } catch (err) {
+      setError(err.message);
       setProcessing(false);
-      setSuccess(true);
-      fireConfetti();
-      playSuccessSound();
-      setTimeout(() => {
-        onPay();
-      }, 3000);
-    }, 2500);
+    }
   };
 
-  // Automated Sync Simulation
-  useEffect(() => {
-    let interval;
-    if (method === "qr" && !processing && !success && !isAutoSyncing) {
-      setIsAutoSyncing(true);
-      setSyncProgress(0);
-    }
-    
-    if (isAutoSyncing) {
-      interval = setInterval(() => {
-        setSyncProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            handlePayment(true);
-            return 100;
-          }
-          // Random increments to feel "real"
-          return prev + Math.floor(Math.random() * 8 + 2);
-        });
-      }, 1500);
-    }
+  const submitManualUPI = async () => {
+    if (!txnId.trim()) { showToast("✗ Please enter Transaction ID", "processing"); return; }
+    setProcessing(true);
+    try {
+      // 1. First create the pending booking in DB
+      const initRes = await fetch(`${API}/payment/create-pending-booking`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          bookingData
+        })
+      });
+      const initData = await initRes.json();
+      
+      if (!initData.success) throw new Error(initData.error || initData.message || "Failed to initialize booking");
 
-    return () => clearInterval(interval);
-  }, [method, isAutoSyncing]);
+      // 2. Now submit the UPI Transaction ID linked to that bookingId
+      const res = await fetch(`${API}/payment/submit-upi`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: initData.bookingId, // User the NEWLY created BKxxxxxx ID
+          upiTransactionId: txnId
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setProcessing(false);
+        setSuccess(true);
+        fireConfetti();
+        playSuccessSound();
+        setTimeout(() => onPay(), 3000);
+      } else {
+        throw new Error(data.message || "Submission failed");
+      }
+    } catch (err) {
+      setError(err.message);
+      setProcessing(false);
+    }
+  };
 
-  const copyUpi = () => {
-    navigator.clipboard.writeText("8106296055@ybl");
-    showToast("📋 UPI ID Copied!", "confirmed");
+  const initRazorpay = async () => {
+    showToast("✦ Online Payment Gateway will be updated in the future. Stay tuned!", "processing", 5000);
   };
 
   return (
-    <div className="modal-overlay open" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: "center", padding: "40px 20px", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 450 }}>
+    <>
+      <div className="modal-overlay open" onClick={onClose}>
+        <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 420, textAlign: "center", padding: "30px 20px", display: "flex", flexDirection: "column", minHeight: 500 }}>
+          <div className="sheet-handle" />
+          
+          {success ? (
+            <div style={{ animation: "popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards", padding: "40px 0" }}>
+              <div className="success-checkmark" style={{ width: 100, height: 100, margin: "0 auto 30px", position: "relative" }}>
+                <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "rgba(76,175,130,0.1)", border: "2px solid #4caf82", animation: "pulseRing 1.5s infinite" }} />
+                <svg fill="none" stroke="#4caf82" strokeWidth="4" viewBox="0 0 24 24" style={{ width: 60, height: 60, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", strokeDasharray: 50, strokeDashoffset: 50, animation: "drawCheck 0.6s ease forwards 0.3s" }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "#4caf82", marginBottom: 15, fontSize: 32, letterSpacing: 1 }}>{method === 'upi' ? 'Request Submitted' : 'Payment Successful'}</h2>
+              <p style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>{method === 'upi' ? 'We are verifying your transaction. Your booking status will be updated shortly.' : 'Your payment was successful and your booking is confirmed.'}</p>
+            </div>
+          ) : error ? (
+            <div style={{ padding: "40px 0" }}>
+              <div style={{ color: "#e05a5a", fontSize: 50, marginBottom: 20 }}>✕</div>
+              <h2 style={{ color: "#fff", marginBottom: 10 }}>Payment Failed</h2>
+              <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 30 }}>{error}</p>
+              <button className="btn-primary" style={{ width: "100%" }} onClick={() => setError("")}>Try Again</button>
+            </div>
+          ) : (
+            <>
+              <div style={{ marginBottom: 25 }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)", marginBottom: 8 }}>✦ Payment Gateway</div>
+                <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 26, color: "#fff" }}>Secure Checkout</h2>
+                <div style={{ fontSize: 13, color: "var(--gold)", marginTop: 5, fontWeight: 600 }}>Amount: ₹{amount.toLocaleString("en-IN")}</div>
+              </div>
 
-        {success ? (
-          <div style={{ animation: "popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards", padding: "40px 0" }}>
-            <div className="success-checkmark" style={{ width: 100, height: 100, margin: "0 auto 30px", position: "relative" }}>
-              <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "rgba(76,175,130,0.1)", border: "2px solid #4caf82", animation: "pulseRing 1.5s infinite" }} />
-              <svg fill="none" stroke="#4caf82" strokeWidth="4" viewBox="0 0 24 24" style={{ width: 60, height: 60, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", strokeDasharray: 50, strokeDashoffset: 50, animation: "drawCheck 0.6s ease forwards 0.3s" }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "#4caf82", marginBottom: 15, fontSize: 34, letterSpacing: 1 }}>Transaction Verified</h2>
-            <div style={{ height: 20 }}>
-              <p style={{ color: "var(--text-muted)", fontSize: 13, animation: "fadeInOut 3s forwards" }}>Booking confirmed. Redirecting to invoice...</p>
-            </div>
-          </div>
-        ) : processing ? (
-          <div style={{ padding: "30px 0" }}>
-            <div className="loading-spinner" style={{ margin: "0 auto 20px", display: "inline-block", width: 40, height: 40, border: "3px solid rgba(201,168,76,0.2)", borderRadius: "50%", borderTopColor: "var(--gold)", animation: "spin 1s ease-in-out infinite" }}></div>
-            <div style={{ color: "var(--gold)", fontSize: 13, letterSpacing: 2, fontWeight: "bold" }}>PROCESSING...</div>
-            <div style={{ fontSize: 11, color: "#888", marginTop: 8 }}>Verifying your transaction ID. Please wait.</div>
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          </div>
-        ) : (
-          <div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "var(--gold)", marginBottom: 10, fontSize: 32 }}>Secure Payment</h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 20 }}>Complete your booking securely.</p>
-            <div style={{ fontSize: 36, fontWeight: "bold", color: "#fff", marginBottom: 25 }}>₹{amount.toLocaleString("en-IN")}</div>
-            
-            <div style={{ display: "flex", gap: 10, marginBottom: 25 }}>
-              <button 
-                onClick={() => setMethod("upi")} 
-                style={{ flex: 1, padding: "12px", background: method === "upi" ? "rgba(201,168,76,0.1)" : "transparent", border: method === "upi" ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: method === "upi" ? "var(--gold)" : "#888", cursor: "pointer", transition: "0.2s", fontSize: 12, fontWeight: 600 }}
-              >
-                UPI PAYMENT
-              </button>
-              <button 
-                onClick={() => setMethod("qr")} 
-                style={{ flex: 1, padding: "12px", background: method === "qr" ? "rgba(201,168,76,0.1)" : "transparent", border: method === "qr" ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: method === "qr" ? "var(--gold)" : "#888", cursor: "pointer", transition: "0.2s", fontSize: 12, fontWeight: 600 }}
-              >
-                QR SCAN
-              </button>
-            </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 30, background: "rgba(255,255,255,0.03)", padding: 5, borderRadius: 10, border: "1px solid rgba(201,168,76,0.1)" }}>
+                <button className={`pay-m-btn${method === "online" ? " active" : ""}`} onClick={() => setMethod("online")} style={{ background: method === "online" ? "var(--gold)" : "transparent", color: method === "online" ? "#111" : "#888", border: "none", padding: "10px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "0.3s" }}>ONLINE PAY</button>
+                <button className={`pay-m-btn${method === "upi" ? " active" : ""}`} onClick={() => setMethod("upi")} style={{ background: method === "upi" ? "var(--gold)" : "transparent", color: method === "upi" ? "#111" : "#888", border: "none", padding: "10px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "0.3s" }}>DIRECT UPI</button>
+              </div>
 
-            <div style={{ minHeight: 250, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              {method === "upi" ? (
-                <div style={{ animation: "fadeIn 0.3s ease", width: "100%" }}>
-                  <div style={{ padding: "20px", background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px dashed rgba(201,168,76,0.3)", marginBottom: 20, backdropFilter: "blur(10px)" }}>
-                    <div style={{ fontSize: 10, color: "var(--gold)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Pay to UPI ID</div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-                      <span style={{ fontSize: 18, color: "#fff", fontWeight: 600, letterSpacing: 1 }}>8106296055@ybl</span>
-                      <button onClick={copyUpi} style={{ background: "rgba(201,168,76,0.1)", border: "none", color: "var(--gold)", cursor: "pointer", fontSize: 18, padding: "5px", borderRadius: "5px", display: "flex", alignItems: "center" }} title="Copy UPI ID">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                      </button>
+              {method === "online" ? (
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                   {processing ? (
+                    <div style={{ padding: "30px 0" }}>
+                      <div className="loading-spinner" style={{ margin: "0 auto 20px", display: "inline-block", width: 40, height: 40, border: "3px solid rgba(201,168,76,0.2)", borderRadius: "50%", borderTopColor: "var(--gold)", animation: "spin 1s ease-in-out infinite" }}></div>
+                      <div style={{ color: "var(--gold)", fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}>Initializing Secure Gateway...</div>
                     </div>
-                  </div>
-                  
-                  <div style={{ textAlign: "left", marginBottom: 20 }}>
-                    <label style={{ fontSize: 10, color: "var(--gold)", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 8 }}>Transaction ID / UTR Number</label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter 12-digit Ref No."
-                      value={transactionId}
-                      onChange={e => setTransactionId(e.target.value)}
-                      style={{ width: "100%", padding: "12px 15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                    />
-                  </div>
-                  <button className="btn-primary" style={{ width: "100%", marginBottom: 15 }} onClick={() => handlePayment(false)}>Verify Payment</button>
+                  ) : (
+                    <>
+                      <div style={{ padding: "20px", background: "rgba(201,168,76,0.05)", borderRadius: 12, border: "1px dashed rgba(201,168,76,0.3)", marginBottom: 25 }}>
+                        <p style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>Pay using Credit/Debit Cards, Netbanking, or any UPI App via Razorpay's secure portal.</p>
+                      </div>
+                      <button className="btn-pay" style={{ width: "100%", padding: "16px", borderRadius: 12, fontSize: 14 }} onClick={initRazorpay}>Pay Securely Now</button>
+                    </>
+                  )}
                 </div>
               ) : (
-                <div style={{ animation: "fadeIn 0.3s ease", width: "100%" }}>
-                  <div style={{ width: 180, height: 180, background: "#fff", margin: "0 auto 20px", padding: "12px", borderRadius: 16, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", position: "relative", overflow: "hidden" }}>
-                    <img 
-                      src={dynamicQrUrl}
-                      alt="MomentO UPI QR" 
-                      style={{ width: "100%", height: "100%", objectFit: "contain" }} 
-                    />
-                    <div style={{ position: "absolute", inset: 0, border: "2px solid var(--gold)", opacity: 0.2, margin: 4, borderRadius: 12 }}></div>
+                <div style={{ flex: 1, overflowY: "auto", paddingRight: 5 }}>
+                  <div style={{ background: "#fff", padding: 12, borderRadius: 15, marginBottom: 15, maxWidth: 200, margin: "0 auto 20px", boxShadow: "0 15px 35px rgba(0,0,0,0.4)", position: "relative" }}>
+                    <img id="qr-image" src={dynamicQR} alt="Payment QR Code" style={{ width: "100%", height: "auto", display: "block", borderRadius: 10 }} />
+                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 40, height: 40, background: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 10px rgba(0,0,0,0.1)" }}>
+                       <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" style={{ width: 25 }} />
+                    </div>
                   </div>
                   
-                  {/* Automated Sync Status UI */}
-                  <div style={{ width: "100%", padding: "0 20px", marginBottom: 20 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 10, color: "var(--gold)", letterSpacing: 1 }}>
-                      <span>📡 BANK SYNC STATUS</span>
-                      <span>{syncProgress}%</span>
-                    </div>
-                    <div style={{ width: "100%", height: 4, background: "rgba(255,255,255,0.05)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${syncProgress}%`, height: "100%", background: "linear-gradient(90deg, #C9A84C, #a855f7)", transition: "width 0.5s ease" }} />
-                    </div>
-                    <div style={{ fontSize: 9, color: "#666", marginTop: 8, textAlign: "center", fontStyle: "italic" }}>
-                      {syncProgress < 30 ? "Initializing secure handshake..." : 
-                       syncProgress < 60 ? "Awaiting UPI network ping..." :
-                       syncProgress < 90 ? "Validating merchant settlement..." : "Payment detected! Finalizing..."}
+                  <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 5 }}>
+                    <div style={{ fontSize: 10, color: "#888", textTransform: "uppercase", letterSpacing: 1 }}>UPI ID: 8106296055@ybl</div>
+                    <div style={{ fontSize: 18, color: "var(--gold)", fontWeight: 700 }}>₹{amount.toLocaleString("en-IN")}</div>
+                    <div style={{ fontSize: 10, color: "#4caf82", fontWeight: 600 }}>✦ Amount Preset Enabled</div>
+                  </div>
+
+                  <a href={upiLink} className="btn-pay" style={{ width: "100%", padding: "12px", borderRadius: 10, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textDecoration: "none", marginBottom: 20, background: "linear-gradient(to right, #C9A84C, #A8893A)" }}>
+                    <span>📱</span> Pay via UPI App
+                  </a>
+
+                  <div className="auth-input-group" style={{ textAlign: "left", marginBottom: 20 }}>
+                    <label style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: 8, display: "block" }}>Enter Transaction ID (UTR)</label>
+                    <div className="auth-input-wrapper">
+                      <span className="auth-input-icon">📜</span>
+                      <input 
+                        className="auth-input-premium" 
+                        type="text" 
+                        placeholder="12-digit Number" 
+                        value={txnId} 
+                        onChange={e => setTxnId(e.target.value)} 
+                        style={{ border: "1px solid rgba(201,168,76,0.1)" }}
+                      />
                     </div>
                   </div>
 
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>Scan & pay. Status updates automatically.</div>
-                  
                   <button 
-                    onClick={() => setMethod("upi")} 
-                    style={{ background: "none", border: "none", color: "var(--gold)", fontSize: 10, textDecoration: "underline", marginTop: 15, cursor: "pointer", opacity: 0.6 }}
+                    className="btn-pay" 
+                    disabled={processing}
+                    style={{ width: "100%", padding: "14px", borderRadius: 10, fontSize: 13, background: processing ? "#333" : "rgba(255,255,255,0.05)", border: "1px solid var(--gold)", color: processing ? "#888" : "var(--gold)" }} 
+                    onClick={submitManualUPI}
                   >
-                    Enter manual UTR instead
+                    {processing ? "SUBMITTING..." : "Confirm Payment"}
                   </button>
+                  <p style={{ fontSize: 9, color: "#555", marginTop: 15 }}>Payment will be verified within 2 hours.</p>
                 </div>
               )}
-            </div>
-            <div className="policy-notice" style={{ marginTop: 15, padding: "10px", borderRadius: 6, background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "var(--text-muted)", fontSize: 11, textAlign: "center" }}>🔒 100% Safe & Secure Payments</div>
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -1851,7 +1881,7 @@ function PaymentGatewayModal({ amount, onPay, onClose }) {
         @keyframes pulseRing { 0% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1); opacity: 0.2; } 100% { transform: scale(0.95); opacity: 0.5; } }
         @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
       `}</style>
-    </div>
+    </>
   );
 }
 
@@ -1898,6 +1928,7 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
   const balance = grandTotal - advance;
   const emi = Math.ceil(balance / 3);
   const services = eventServices[event?.name] || [];
+  const hasCateringSupport = services.some(s => s.vegPrice || s.nonVegPrice);
   const toggle = (s) => setSelected(p => p.find(x => x.name === s.name) ? p.filter(x => x.name !== s.name) : [...p, s]);
 
   const pay = () => {
@@ -1940,6 +1971,7 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
     return (
       <PaymentGatewayModal
         amount={payMode === "advance" || payMode === "emi" ? advance : grandTotal}
+        bookingData={pendingBooking}
         onPay={() => {
           fetch(`${API}/bookings`, {
             method: "POST",
@@ -1969,7 +2001,7 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
           }).catch(err => console.error("❌ Booking save failed:", err));
           onConfirm(pendingBooking);
           onClose();
-          showToast("⏳ Booking Confirmed! Invoice Generated.", "confirmed", 5000);
+          showToast(`✨ ${pendingBooking.name}, your ${pendingBooking.event} booking is successful!`, "confirmed", 6000);
         }}
         onClose={() => setPendingBooking(null)}
       />
@@ -1990,45 +2022,96 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
           <input className="modal-input" type="number" placeholder="Estimated Guest Count" value={guests} onChange={e => setGuests(e.target.value)} />
           <input className="modal-input" type="date" value={date} onChange={e => setDate(e.target.value)} min={new Date().toISOString().split("T")[0]} />
 
-          <div style={{ margin: "15px 0" }}>
-            <label style={{ fontSize: 11, color: "var(--gold)", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 10 }}>Catering Food Type</label>
-            <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: 3, border: "1px solid rgba(201,168,76,0.3)" }}>
-              <button
-                onClick={() => setFoodType("veg")}
-                style={{
-                  flex: 1, padding: "10px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontFamily: "'Montserrat',sans-serif",
-                  background: foodType === "veg" ? "rgba(76,175,130,0.2)" : "transparent",
-                  color: foodType === "veg" ? "#4caf82" : "#888",
-                  transition: "all 0.3s"
-                }}
-              >🥬 Vegetarian</button>
-              <button
-                onClick={() => setFoodType("non_veg")}
-                style={{
-                  flex: 1, padding: "10px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontFamily: "'Montserrat',sans-serif",
-                  background: foodType === "non_veg" ? "rgba(224,90,90,0.2)" : "transparent",
-                  color: foodType === "non_veg" ? "#e05a5a" : "#888",
-                  transition: "all 0.3s"
-                }}
-              >🍗 Non-Vegetarian</button>
+          { (hasCateringSupport && selected.some(s => s.vegPrice || s.nonVegPrice)) && (
+            <div style={{ marginBottom: 25 }}>
+              <div className="services-title">✦ Catering Preference</div>
+              <div style={{ 
+                background: "rgba(255,255,255,0.02)", 
+                border: "1px solid rgba(201,168,76,0.15)", 
+                borderRadius: "12px", 
+                overflow: "hidden" 
+              }}>
+                <div 
+                  className="service-item" 
+                  onClick={() => setFoodType("veg")}
+                  style={{ 
+                    padding: "16px", 
+                    cursor: "pointer", 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: 15,
+                    background: foodType === "veg" ? "rgba(201,168,76,0.08)" : "transparent",
+                    transition: "0.3s"
+                  }}
+                >
+                  <div style={{ 
+                    width: 22, height: 22, borderRadius: "50%", 
+                    border: foodType === "veg" ? "2px solid var(--gold)" : "2px solid rgba(255,255,255,0.2)",
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
+                  }}>
+                    {foodType === "veg" && <div style={{ width: 10, height: 10, background: "var(--gold)", borderRadius: "50%" }} />}
+                  </div>
+                  <label style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
+                    <span style={{ fontSize: 20 }}>🥬</span>
+                    <span style={{ fontSize: 13, fontWeight: foodType === "veg" ? 600 : 400, color: foodType === "veg" ? "#fff" : "var(--text-muted)" }}>Pure Vegetarian Menu</span>
+                  </label>
+                  {foodType === "veg" && <span style={{ fontSize: 10, color: "var(--gold)", fontWeight: 700, letterSpacing: 1 }}>SELECTED</span>}
+                </div>
+
+                <div style={{ height: "1px", background: "rgba(201,168,76,0.1)" }} />
+
+                <div 
+                  className="service-item" 
+                  onClick={() => setFoodType("non_veg")}
+                  style={{ 
+                    padding: "16px", 
+                    cursor: "pointer", 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: 15,
+                    background: foodType === "non_veg" ? "rgba(201,168,76,0.08)" : "transparent",
+                    transition: "0.3s"
+                  }}
+                >
+                  <div style={{ 
+                    width: 22, height: 22, borderRadius: "50%", 
+                    border: foodType === "non_veg" ? "2px solid var(--gold)" : "2px solid rgba(255,255,255,0.2)",
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
+                  }}>
+                    {foodType === "non_veg" && <div style={{ width: 10, height: 10, background: "var(--gold)", borderRadius: "50%" }} />}
+                  </div>
+                  <label style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
+                    <span style={{ fontSize: 20 }}>🍗</span>
+                    <span style={{ fontSize: 13, fontWeight: foodType === "non_veg" ? 600 : 400, color: foodType === "non_veg" ? "#fff" : "var(--text-muted)" }}>Non-Vegetarian Menu</span>
+                  </label>
+                  {foodType === "non_veg" && <span style={{ fontSize: 10, color: "var(--gold)", fontWeight: 700, letterSpacing: 1 }}>SELECTED</span>}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Menu Preview Section */}
           {(() => {
             const selectedCatering = selected.find(s => s.vegPrice || s.nonVegPrice);
             if (!selectedCatering) return null;
 
-            let tier = "Silver";
-            if (selectedCatering.name.includes("Gold")) tier = "Gold";
-            if (selectedCatering.name.includes("Platinum") || selectedCatering.name.includes("Royal")) tier = "Platinum";
+            // Determine Category
+            let category = "buffet";
+            const sName = selectedCatering.name.toLowerCase();
+            const eName = event?.name?.toLowerCase() || "";
 
-            const menu = cateringMenus[tier][foodType];
+            if (sName.includes("high tea") || sName.includes("cookies")) category = "high_tea";
+            else if (sName.includes("lunch box")) category = "lunch_box";
+            else if (sName.includes("youth") || sName.includes("snack") || sName.includes("fast food") || 
+                     eName.includes("fest") || eName.includes("concert") || eName.includes("farewell")) category = "youth";
+
+            const menu = categorizedMenus[category][foodType];
+            const title = category.replace("_", " ").toUpperCase();
 
             return (
               <div style={{ padding: 14, background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 10, marginBottom: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, alignItems: "center" }}>
-                  <span style={{ fontSize: 11, color: "var(--gold)", letterSpacing: 1, textTransform: "uppercase" }}>✦ {tier} Menu Preview</span>
+                  <span style={{ fontSize: 11, color: "var(--gold)", letterSpacing: 1, textTransform: "uppercase" }}>✦ {title} Menu Preview</span>
                   <span style={{ fontSize: 9, color: "var(--text-muted)" }}>{menu.length} Items Included</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 15px" }}>
@@ -2211,6 +2294,7 @@ function PkgModal({ pkg, loggedInUser, onClose, onConfirm, bookings = [] }) {
     return (
       <PaymentGatewayModal
         amount={advance}
+        bookingData={pendingBooking}
         onPay={() => {
           fetch(`${API}/bookings`, {
             method: "POST",

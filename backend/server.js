@@ -22,6 +22,7 @@ app.use("/api/reviews",  require("./routes/review.routes"));
 app.use("/api/events",   require("./routes/event.routes"));
 app.use("/api/admin",    require("./routes/admin.routes"));
 app.use("/api/upload",   require("./routes/upload.routes"));
+app.use("/api/payment",  require("./routes/payment.routes"));
 
 // ── TEST ROUTE ──
 app.get("/api/health", (req, res) => res.status(200).json({ status: "UP", timestamp: new Date() }));

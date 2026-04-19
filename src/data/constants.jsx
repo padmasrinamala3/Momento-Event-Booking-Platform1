@@ -202,23 +202,27 @@ export const eventsDataDefault = [
       { num: 5, img: "https://i.pinimg.com/1200x/98/a3/39/98a33910dd6463424022a30c94ba7d03.jpg", price: 18500 },
       { num: 6, img: "https://i.pinimg.com/736x/3c/b2/7e/3cb27e8afd8814c22d2cee2be658b3e9.jpg", price: 24000 },
       { num: 7, img: "https://i.pinimg.com/1200x/e0/0f/2d/e00f2d2048f2fbc04d9643a09972e0bc.jpg", price: 30000 },
-      { num: 8, img: "https://i.pinimg.com/1200x/7b/cd/b6/7bcdb6c6eb887dccb20d514f724ed101.jpg", price: 40000 }
+{ num: 8, img: "https://i.pinimg.com/1200x/7b/cd/b6/7bcdb6c6eb887dccb20d514f724ed101.jpg", price: 40000 }
     ]
   },
 ];
 
-export const cateringMenus = {
-  "Silver": {
-    veg: ["🥬 Paneer Majestic", "🥬 Veg Dum Biryani", "🥬 Mixed Veg Curry", "🥬 Bagara Dal", "🥬 Rumali Roti", "🥬 Gulab Jamun", "🥬 Onion Raitha"],
-    non_veg: ["🍗 Chicken 65", "🍗 Chicken Dum Biryani", "🍗 Egg Masala Curry", "🍗 Mixed Veg Curry", "🍗 Rumali Roti", "🍗 Gulab Jamun", "🍗 Onion Raitha"]
+export const categorizedMenus = {
+  buffet: {
+    veg: ["Welcome Drink", "2 Starters (Veg)", "Premium Paneer Curry", "Special Dal Fry", "Butter Kulcha / Roti", "Veg Pulao / Jeera Rice", "1 Dessert (Sweet)", "Ice Cream", "Mineral Water"],
+    non_veg: ["Welcome Drink", "1 Veg Starter", "1 Non-Veg Starter", "Butter chicken / Mutton Curry", "Fish Fry (Special)", "Butter Kulcha / Roti", "Chicken Biryani", "1 Dessert (Sweet)", "Ice Cream", "Mineral Water"]
   },
-  "Gold": {
-    veg: ["🥬 Crispy Corn Starters", "🥬 Paneer Butter Masala", "🥬 Veg Pulao", "🥬 Dal Tadka", "🥬 Butter Naan", "🥬 Gajar Ka Halwa", "🥬 Premium Ice Cream", "🥬 Soft Drinks / Water", "🥬 Salad & Papad"],
-    non_veg: ["🍗 Chilli Chicken Starters", "🍗 Mutton Curry", "🍗 Chicken Dum Biryani", "🍗 Dal Tadka", "🍗 Butter Naan", "🍗 Gajar Ka Halwa", "🍗 Premium Ice Cream", "🍗 Soft Drinks / Water", "🍗 Salad & Papad"]
+  high_tea: {
+    veg: ["Masala Tea / Coffee", "Assorted Cookies", "Veg Samosas (Large)", "Paneer Spring Rolls", "Veg Cutlets", "Cupcakes / brownies", "Mineral Water"],
+    non_veg: ["Masala Tea / Coffee", "Assorted Cookies", "Chicken Samosas", "Chicken Spring Rolls", "Chicken Seekh Kebabs", "Cupcakes / brownies", "Mineral Water"]
   },
-  "Platinum": {
-    veg: ["🥬 Mushroom 65", "🥬 Baby Corn Manchurian", "🥬 Paneer Tikka Masala", "🥬 Kaju Veg Biryani", "🥬 Dal Makhani", "🥬 Garlic Naan", "🥬 Apricot Delight (Sweet)", "🥬 Double Ka Meetha", "🥬 Multi-flavor Ice Cream", "🥬 Exotic Mocktails", "🥬 Welcome Soup", "🥬 Premium Salad Bar"],
-    non_veg: ["🍗 Apollo Fish Fry", "🍗 Prawns Iguru", "🍗 Special Mutton Biryani", "🍗 Chicken Roast Curry", "🍗 Dal Makhani", "🍗 Garlic Naan", "🍗 Apricot Delight (Sweet)", "🍗 Double Ka Meetha", "🍗 Multi-flavor Ice Cream", "🍗 Exotic Mocktails", "🍗 Welcome Soup", "🍗 Premium Salad Bar"]
+  lunch_box: {
+    veg: ["Flavored Rice (Pulihara)", "Steamed Rice", "Fresh Curd Rice", "1 Dry Veg Fry", "1 Gravy Veg Curry", "Appalam / Papad", "Special Pickle", "1 Small Sweet"],
+    non_veg: ["Chicken Biryani (Mini)", "White Rice", "Fresh Curd Rice", "Chicken Fry", "Chicken Gravy Curry", "Appalam / Papad", "Special Pickle", "1 Small Sweet"]
+  },
+  youth: {
+    veg: ["Mocktails / Cold Drinks", "Cheese Sliders (2 pcs)", "Veg Pizza Slices", "White Sauce Pasta", "French Fries / Potato Wedges", "Choco Lava Cake", "Mineral Water"],
+    non_veg: ["Mocktails / Cold Drinks", "Chicken Burgers (Sliders)", "Chicken Pizza Slices", "Red Sauce Pasta (Chicken)", "Peri Peri Fries", "Choco Lava Cake", "Mineral Water"]
   }
 };
 
@@ -248,7 +252,16 @@ export const eventServices = {
     { name: "Makeup Artist", price: 3000 },
     { name: "Invitation Cards (50 pcs)", price: 800 }
   ],
-  "Corporate Event": [{ name: "Stage & Podium Setup", price: 18000 }, { name: "LED Wall", price: 22000 }, { name: "Sound System + Mic", price: 10000 }, { name: "Decoration", price: 8000 }, { name: "Drone Photography", price: 8000 }, { name: "Invitation Cards", price: 3000 }],
+  "Corporate Event": [
+    { name: "Executive High Tea & Cookies", price: 15000 },
+    { name: "Premium Corporate Lunch Box", vegPrice: 200, nonVegPrice: 300 },
+    { name: "Stage & Podium Setup", price: 18000 },
+    { name: "LED Wall", price: 22000 },
+    { name: "Sound System + Mic", price: 10000 },
+    { name: "Decoration (Formal)", price: 8000 },
+    { name: "Professional Drone Coverage", price: 8000 },
+    { name: "Invitation Cards (E-cards)", price: 3000 }
+  ],
   "Engagement": [
     { name: "Standard Catering", vegPrice: 200, nonVegPrice: 300 },
     { name: "Premium Catering", vegPrice: 450, nonVegPrice: 600 },
@@ -263,10 +276,34 @@ export const eventServices = {
   ],
   "Baby Shower": [{ name: "Theme Decoration", price: 5000 }, { name: "Catering (Customizable)", vegPrice: 200, nonVegPrice: 350 }, { name: "Custom Cake", price: 1800 }, { name: "Flower Decoration", price: 4000 }, { name: "Makeup Artist", price: 3000 }, { name: "Invitation Cards", price: 700 }],
   "House Warming": [{ name: "Pooja Samagri Setup", price: 3500 }, { name: "Flower & Mango Leaf Decoration", price: 5000 }, { name: "Catering (Customizable)", vegPrice: 250, nonVegPrice: 400 }, { name: "Invitation Cards", price: 1000 }],
-  "Farewell Party": [{ name: "DJ (3 hrs)", price: 8000 }, { name: "Stage & Backdrop", price: 7000 }, { name: "Flower Decoration", price: 4000 }, { name: "Custom Cake", price: 1500 }, { name: "Photography", price: 5000 }, { name: "Invitation Cards", price: 700 }],
+  "Farewell Party": [
+    { name: "Social Dinner Buffet", vegPrice: 180, nonVegPrice: 280 },
+    { name: "DJ Night (3 hrs)", price: 8000 },
+    { name: "Stage & Backdrop", price: 7000 },
+    { name: "Flower Decoration", price: 4000 },
+    { name: "Custom Send-off Cake", price: 1500 },
+    { name: "Photography & Highlights", price: 5000 },
+    { name: "Guest Mementos (50 pcs)", price: 5000 }
+  ],
   "Anniversary": [{ name: "Romantic Decoration", price: 8000 }, { name: "Candle Light Dinner Setup", price: 6000 }, { name: "Flower Decoration", price: 5000 }, { name: "Custom Cake", price: 1200 }, { name: "Makeup Artist", price: 4000 }, { name: "Photography & Video", price: 8000 }],
-  "College Fest": [{ name: "DJ Night (6 hrs)", price: 18000 }, { name: "Stage & Truss Lighting", price: 25000 }, { name: "Sound System", price: 15000 }, { name: "Decoration", price: 8000 }, { name: "Drone Photography", price: 8000 }],
-  "Music Concert": [{ name: "Live Band (4 hrs)", price: 40000 }, { name: "Stage & Lighting", price: 35000 }, { name: "Sound System", price: 20000 }, { name: "Drone Photography", price: 10000 }, { name: "Decoration", price: 10000 }],
+  "College Fest": [
+    { name: "Youth Snack Packs (Bulk)", price: 12000 },
+    { name: "Premium Fast Food Buffet", vegPrice: 150, nonVegPrice: 220 },
+    { name: "DJ Night (6 hrs) + Sound", price: 18000 },
+    { name: "Stage & Truss Lighting", price: 25000 },
+    { name: "LED Wall Setup", price: 15000 },
+    { name: "Event Decoration", price: 8000 },
+    { name: "Drone Photography", price: 8000 }
+  ],
+  "Music Concert": [
+    { name: "VIP Lounge Snack Packs", price: 15000 },
+    { name: "Standard Artist Catering", vegPrice: 300, nonVegPrice: 500 },
+    { name: "Live Band (4 hrs)", price: 40000 },
+    { name: "Stage, Lighting & LED", price: 35000 },
+    { name: "High-end Sound System", price: 20000 },
+    { name: "Drone Coverage", price: 10000 },
+    { name: "Backstage Decoration", price: 10000 }
+  ],
   "Half Saree Function": [
     { name: "Standard Catering", vegPrice: 200, nonVegPrice: 350 },
     { name: "Premium Catering", vegPrice: 450, nonVegPrice: 650 },

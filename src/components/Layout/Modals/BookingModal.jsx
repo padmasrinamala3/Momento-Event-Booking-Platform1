@@ -33,129 +33,159 @@ const BookingModal = ({ event, onClose }) => {
     );
   };
 
-  // ⭐ PAYMENT FUNCTION
-  const pay = async () => {
-    console.log("=== PAY CLICKED ===");
-    console.log("name:", name);
-    console.log("date:", date);
-    console.log("selected:", selected);
-    console.log("loggedInUser:", loggedInUser);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [confirmedId, setConfirmedId] = useState("");
 
+  // ⭐ RAZORPAY PAYMENT FLOW
+  const pay = async () => {
     if (!name || !phone || !date || !selected.length) {
-      console.log("❌ VALIDATION FAILED — name/phone/date/services missing");
       showToast("⚠ Fill all details & select services", "processing");
       return;
     }
 
-    console.log("✅ Validation Passed — going to API");
-
-    const b = {
-      bookingId: "BK" + Math.floor(100000 + Math.random() * 900000), // Generate custom booking ID
+    const bookingId = "BK" + Math.floor(100000 + Math.random() * 900000);
+    const bookingData = {
+      bookingId,
       event: event.name,
-      date: date,
-      name: name,
-      phone: phone,
+      date,
+      name,
+      phone,
       services: selected.map(s => s.name).join(", "),
       price: total,
       user: loggedInUser?._id || loggedInUser?.id || "unknown"
     };
 
-    console.log("📦 Booking Object:", b);
-    showToast("💳 Processing Payment...", "processing", 2200);
-
-    // Try to sync with backend first
     try {
-      console.log("🚀 Sending to backend...");
-      console.log("📦 Booking data:", b);
+      showToast("💳 Initializing Secure Payment...", "processing");
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-
-      const res = await fetch(`${API_BASE}/bookings`, {
+      // 1. Create Order and Pending Booking on Backend
+      const orderRes = await fetch(`${API_BASE}/payment/create-order`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(b),
-        signal: controller.signal
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          amount: total,
+          bookingData: {
+            ...bookingData,
+            userEmail: loggedInUser?.email || "guest"
+          }
+        })
       });
+      const orderData = await orderRes.json();
 
-      clearTimeout(timeoutId);
+      if (!orderData.id) throw new Error("Order creation failed");
 
-      console.log("📡 Response status:", res.status);
-      console.log("📡 Response ok:", res.ok);
+      // 2. Fetch Razorpay Key and Launch Checkout
+      const keyRes = await fetch(`${API_BASE}/payment/get-key`);
+      const { key } = await keyRes.json();
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("❌ Backend Error Response:", errorData);
-        throw new Error(errorData.message || "Server error");
-      }
+      const options = {
+        key: key, 
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "MomentO Events",
+        description: `Booking for ${event.name}`,
+        order_id: orderData.id,
+        handler: async (response) => {
+          try {
+            showToast("🔒 Verifying Payment...", "processing");
 
-      const data = await res.json();
-      console.log("✅ Saved in MongoDB:", data);
+            // 3. Verify Payment on Backend
+            const verifyRes = await fetch(`${API_BASE}/payment/verify-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...response,
+                bookingId,
+                bookingData // Fallback if record missing
+              })
+            });
 
-      // Update booking object with real MongoDB ID
-      b._id = data._id;
-      b.id = data._id;
+            const verifyData = await verifyRes.json();
 
-      // Add to local state
-      addBooking(b);
-      console.log("✅ Booking added to local state with MongoDB ID:", data._id);
+            if (verifyData.success) {
+              // 4. Update local state and show success
+              addBooking({ 
+                ...bookingData, 
+                _id: verifyData.booking._id, 
+                status: "confirmed",
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id
+              });
+              setConfirmedId(bookingId);
+              setShowSuccess(true);
+              
+              // Standard confetti trigger (simple version)
+              for(let i=0; i<30; i++) {
+                const conf = document.createElement("div");
+                conf.className = "confetti-piece";
+                conf.style.left = Math.random() * 100 + "vw";
+                conf.style.backgroundColor = ["#C9A84C", "#fff", "#ec4899"][Math.floor(Math.random()*3)];
+                conf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                conf.style.animationDuration = (Math.random() * 3 + 2) + "s";
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 5000);
+              }
 
-      // Success feedback
-      showToast(
-        "✅ Payment ₹" + total.toLocaleString("en-IN") + " Successful!",
-        "success",
-        3000
-      );
+            } else {
+              showToast("❌ Payment verification failed", "error");
+            }
+          } catch (err) {
+            console.error(err);
+            showToast("❌ Verification Error", "error");
+          }
+        },
+        prefill: { name, contact: phone, email: loggedInUser?.email || "" },
+        theme: { color: "#0a0a0f" },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI ID",
+                instruments: [{ method: "upi", flows: ["collect"] }]
+              }
+            },
+            sequence: ["block.upi"],
+            preferences: { show_default_blocks: false }
+          }
+        }
+      };
 
-      setTimeout(() => {
-        onClose();
-
-        showToast(
-          "🎉 Booking Confirmed!\n" + 
-          "Name: " + name + "\n" +
-          "Event: " + event.name + "\n" +
-          "Date: " + date + "\n" +
-          "Amount: ₹" + total.toLocaleString("en-IN") + "\n" +
-          "ID: " + b.id?.slice(0, 8) + "...",
-          "confirmed",
-          5000
-        );
-
-      }, 800);
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response){
+        showToast("❌ Payment Failed: " + response.error.description, "error");
+      });
+      rzp.open();
 
     } catch (err) {
-      console.error("❌ Backend Error:", err);
-      
-      // Fallback: add to local state with temp ID
-      const tempId = "temp_" + Date.now();
-      b._id = tempId;
-      b.id = tempId;
-      
-      addBooking(b);
-      console.log("🔄 Backend failed, but booking saved locally with temp ID:", tempId);
-      showToast("⚠️ Booking saved locally. Server sync may be delayed.", "warning", 4000);
-      
-      setTimeout(() => {
-        onClose();
-
-        showToast(
-          "🎉 Booking Confirmed!\n" + 
-          "Name: " + name + "\n" +
-          "Event: " + event.name + "\n" +
-          "Date: " + date + "\n" +
-          "Amount: ₹" + total.toLocaleString("en-IN") + "\n" +
-          "ID: " + b.id?.slice(0, 8) + "...",
-          "confirmed",
-          5000
-        );
-
-      }, 800);
-      
-      return;
+      console.error(err);
+      showToast("❌ Could not start payment", "error");
     }
   };
+
+  if (showSuccess) {
+    return (
+      <div className="payment-success-overlay">
+        <div className="ps-content">
+          <div className="ps-icon-wrap">
+            <svg className="ps-checkmark" viewBox="0 0 52 52">
+              <path d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+          </div>
+          <h2 className="ps-title">Booking Confirmed!</h2>
+          <p className="ps-subtitle">Your celebration is now secured</p>
+          
+          <div className="ps-id-box">
+            <div className="ps-id-label">Registration ID</div>
+            <div className="ps-id-val">{confirmedId}</div>
+          </div>
+          
+          <button className="ps-btn" onClick={onClose}>
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="modal-overlay open">

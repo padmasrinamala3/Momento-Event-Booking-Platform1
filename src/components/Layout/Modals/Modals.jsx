@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useApp } from "../../context/AppContext";
 import { showToast } from "../Layout/Layout";
+import API_BASE from "../../../config/api";
 
 // ── PACKAGE MODAL ──
 export const PackageModal = ({ pkg, onClose }) => {
@@ -9,27 +10,155 @@ export const PackageModal = ({ pkg, onClose }) => {
   const [phone, setPhone] = useState(loggedInUser?.phone || "");
   const [date, setDate] = useState("");
   const [payMode, setPayMode] = useState("full");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [confirmedId, setConfirmedId] = useState("");
   const emi = Math.ceil((pkg?.num || 0) / 3);
 
-  const confirm = () => {
+  const confirm = async () => {
     if (!name || !phone || !date) { showToast("✗ Fill all details", "processing"); return; }
-    const b = {
-      id: "BK" + Date.now().toString().slice(-6),
-      name, phone, event: pkg.name + " Package", date,
+    
+    const bookingId = "BK" + Math.floor(100000 + Math.random() * 900000);
+    const bookingData = {
+      bookingId,
+      event: pkg.name + " Package",
+      date,
+      name,
+      phone,
       services: "Package · " + (payMode === "emi" ? "EMI 3 Months" : "Full Payment"),
-      price: pkg.num, status: "confirmed",
+      price: pkg.num,
       payMode: payMode === "emi" ? "EMI" : "Full",
-      userEmail: loggedInUser?.email || "guest"
+      user: loggedInUser?._id || loggedInUser?.id || "unknown"
     };
-    showToast("⏳ Processing...", "processing", 2200);
-    setTimeout(() => {
-      showToast("✅ Payment Successful!", "success", 3000);
-      setTimeout(() => {
-        addBooking(b); onClose();
-        showToast("🎉 " + pkg.name + " Package Booked — " + name, "confirmed", 3500);
-      }, 800);
-    }, 2000);
+
+    try {
+      showToast("💳 Initializing Secure Payment...", "processing");
+
+      // 1. Create Order and Pending Booking on Backend
+      const orderRes = await fetch(`${API_BASE}/payment/create-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          amount: pkg.num,
+          bookingData: {
+            ...bookingData,
+            userEmail: loggedInUser?.email || "guest"
+          }
+        })
+      });
+      const orderData = await orderRes.json();
+
+      if (!orderData.id) throw new Error("Order creation failed");
+
+      // 2. Fetch Razorpay Key and Launch Checkout
+      const keyRes = await fetch(`${API_BASE}/payment/get-key`);
+      const { key } = await keyRes.json();
+
+      const options = {
+        key: key, 
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "MomentO Events",
+        description: `Package: ${pkg.name}`,
+        order_id: orderData.id,
+        handler: async (response) => {
+          try {
+            showToast("🔒 Verifying Payment...", "processing");
+
+            // 3. Verify Payment on Backend
+            const verifyRes = await fetch(`${API_BASE}/payment/verify-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...response,
+                bookingId
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.success) {
+              // 4. Update local state and show success
+              addBooking({ 
+                ...bookingData, 
+                _id: verifyData.booking._id, 
+                status: "confirmed",
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id
+              });
+              setConfirmedId(bookingId);
+              setShowSuccess(true);
+              
+              // Standard confetti trigger
+              for(let i=0; i<30; i++) {
+                const conf = document.createElement("div");
+                conf.className = "confetti-piece";
+                conf.style.left = Math.random() * 100 + "vw";
+                conf.style.backgroundColor = ["#C9A84C", "#fff", "#ec4899"][Math.floor(Math.random()*3)];
+                conf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                conf.style.animationDuration = (Math.random() * 3 + 2) + "s";
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 5000);
+              }
+            } else {
+              showToast("❌ Payment verification failed", "error");
+            }
+          } catch (err) {
+            console.error(err);
+            showToast("❌ Verification Error", "error");
+          }
+        },
+        prefill: { name, contact: phone, email: loggedInUser?.email || "" },
+        theme: { color: "#0a0a0f" },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI ID",
+                instruments: [{ method: "upi", flows: ["collect"] }]
+              }
+            },
+            sequence: ["block.upi"],
+            preferences: { show_default_blocks: false }
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response){
+        showToast("❌ Payment Failed: " + response.error.description, "error");
+      });
+      rzp.open();
+
+    } catch (err) {
+      console.error(err);
+      showToast("❌ Could not start payment", "error");
+    }
   };
+
+  if (showSuccess) {
+    return (
+      <div className="payment-success-overlay">
+        <div className="ps-content">
+          <div className="ps-icon-wrap">
+            <svg className="ps-checkmark" viewBox="0 0 52 52">
+              <path d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+          </div>
+          <h2 className="ps-title">Package Booked!</h2>
+          <p className="ps-subtitle">Your {pkg?.name} package is now active</p>
+          
+          <div className="ps-id-box">
+            <div className="ps-id-label">Registration ID</div>
+            <div className="ps-id-val">{confirmedId}</div>
+          </div>
+          
+          <button className="ps-btn" onClick={onClose}>
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="modal-overlay open" onClick={onClose}>

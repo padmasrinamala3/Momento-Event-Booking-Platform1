@@ -21,6 +21,11 @@ const bookingSchema = new mongoose.Schema({
   payMode:  { type: String, default: "Full Payment" },
   status:   { type: String, enum: ["pending", "confirmed", "completed", "cancelled"], default: "pending" },
   shift:    { type: String, enum: ["morning", "night"], default: "night" },
+  razorpayOrderId: { type: String },
+  razorpayPaymentId: { type: String },
+  razorpaySignature: { type: String },
+  upiTransactionId: { type: String },
+  paymentMethod: { type: String, enum: ["razorpay", "upi"], default: "razorpay" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Booking", bookingSchema);

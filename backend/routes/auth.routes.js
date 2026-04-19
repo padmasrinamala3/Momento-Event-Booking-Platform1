@@ -66,17 +66,20 @@ router.post("/google-callback", async (req, res) => {
   }
 });
 
-// POST /api/auth/forgot-password (Simulated)
+// POST /api/auth/forgot-password (Actual Reset)
 router.post("/forgot-password", async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: "Email is required" });
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) return res.status(400).json({ message: "Email and new password are required" });
     
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "Email not found in our records" });
     
-    // In a real application, you would generate a reset token and send an email here.
-    res.json({ message: "Password reset link sent to your email" });
+    // Update the password - the pre-save hook in User model will handle hashing
+    user.password = newPassword;
+    await user.save();
+    
+    res.json({ message: "Password updated successfully! You can now login." });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
