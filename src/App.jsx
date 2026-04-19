@@ -2457,7 +2457,7 @@ function InvoiceModal({ bookingId, bookings, isAdminView, onClose }) {
         <div className="invoice-actions no-print">
           <button className="btn-download-invoice" onClick={() => window.print()}>⬇ Download / Print</button>
           <a 
-            href={`https://wa.me/${targetPhone}?text=${isAdminView ? encodeURIComponent('Admin Copy of Invoice') : ''}Hello%20*${encodeURIComponent(b.name)}*%20!%20✨%0A%0AYour%20booking%20for%20*${encodeURIComponent(b.event)}*%20on%20*${encodeURIComponent(b.date)}*%20is%20*Confirmed*!%20✅%0A%0A*Booking%20Details:*%0A✦%20ID:%20*#${b.id}*%0A✦%20Event:%20*${encodeURIComponent(b.event)}*%0A✦%20Date:%20*${encodeURIComponent(b.date)}*%20(${b.shift})%0A%0A*Payment%20Summary:*%0A✦%20Total:%20₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}%0A✦%20Advance%20Paid:%20₹${b.advancePaid?.toLocaleString("en-IN") || "—"}%0A✦%20Balance:%20₹${b.remainingBalance?.toLocaleString("en-IN") || "—"}%0A%0AThank%20you%20for%20choosing%20*MomentO%20Events*%20!%20🙏`} 
+            href={`https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`} 
             target="_blank" 
             rel="noreferrer" 
             className="btn-whatsapp-premium-action"
