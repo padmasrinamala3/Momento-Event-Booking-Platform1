@@ -2413,6 +2413,21 @@ function InvoiceModal({ bookingId, bookings, isAdminView, onClose }) {
   if (!b) return null;
 
   const targetPhone = isAdminView ? WHATSAPP : (b.phone?.toString().startsWith('91') ? b.phone : '91' + b.phone);
+  const message = `${isAdminView ? 'Admin Copy of Invoice\n' : ''}Hello *${b.name}* ! ✨
+
+Your booking for *${b.event}* on *${b.date}* is *Confirmed*! ✅
+
+*Booking Details:*
+✦ ID: *#${b.id}*
+✦ Event: *${b.event}*
+✦ Date: *${b.date}* (${b.shift})
+
+*Payment Summary:*
+✦ Total: ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}
+✦ Advance Paid: ₹${b.advancePaid?.toLocaleString("en-IN") || "—"}
+✦ Balance: ₹${b.remainingBalance?.toLocaleString("en-IN") || "—"}
+
+Thank you for choosing *MomentO Events* ! 🙏`;
   return (
     <div className="invoice-modal-overlay open" onClick={onClose}>
       <div className="invoice-box" onClick={e => e.stopPropagation()}>
