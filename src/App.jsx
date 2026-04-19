@@ -2412,27 +2412,29 @@ function InvoiceModal({ bookingId, bookings, isAdminView, onClose }) {
   const b = bookings.find(x => x.id === bookingId);
   if (!b) return null;
 
+  const WHATSAPP = "8106296055"; // Business Phone
   const targetPhone = isAdminView ? WHATSAPP : (b.phone?.toString().startsWith('91') ? b.phone : '91' + b.phone);
   const message = `${isAdminView ? 'Admin Copy of Invoice\n' : ''}Hello *${b.name}* ! ✨
 
 Your booking for *${b.event}* on *${b.date}* is *Confirmed*! ✅
+
+*Payment Summary:*
+✦ Total Amount: ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}
+✦ Advance Paid: ₹${b.advancePaid?.toLocaleString("en-IN") || "0"}
+✦ Remaining Balance: ₹${b.remainingBalance?.toLocaleString("en-IN") || "0"}
 
 *Booking Details:*
 ✦ ID: *#${b.id}*
 ✦ Event: *${b.event}*
 ✦ Date: *${b.date}* (${b.shift})
 
-*Payment Summary:*
-✦ Total: ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}
-✦ Advance Paid: ₹${b.advancePaid?.toLocaleString("en-IN") || "—"}
-✦ Balance: ₹${b.remainingBalance?.toLocaleString("en-IN") || "—"}
-
 Thank you for choosing *MomentO Events* ! 🙏`;
+
   return (
     <div className="invoice-modal-overlay open" onClick={onClose}>
       <div className="invoice-box" onClick={e => e.stopPropagation()}>
         <div className="sheet-handle" style={{ background: "rgba(0,0,0,.15)" }} />
-        <div className="invoice-header"><div className="invoice-logo">MomentO</div><div className="invoice-sub">Premium Event Planning · Official Receipt</div></div>
+        <div className="invoice-header"><div className="invoice-logo">MomentO</div><div className="invoice-sub">Premium Event Planning • Official Invoice</div></div>
         <div className="invoice-body">
           <div className="invoice-meta">
             <div className="invoice-meta-block"><h5>Billed To</h5><p>{b.name}</p><p style={{ color: "#888", fontSize: 11, marginTop: 2 }}>{b.phone || ""}</p></div>
