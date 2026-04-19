@@ -1054,3 +1054,32 @@ footer { position: relative; z-index: 1; text-align: center; padding: 36px 20px 
 .gmock-name { font-size: 14px; color: #fff; font-weight: 500; }
 .gmock-email { font-size: 12px; color: var(--text-muted); }
 .gmock-footer { margin-top: 30px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+
+
+/* ── WHATSAPP PREMIUM ACTION ── */
+.btn-whatsapp-premium-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  min-height: var(--touch-min);
+  background: #25D366;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(37,211,102,0.3);
+}
+
+.btn-whatsapp-premium-action:hover {
+  background: #1eb954;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+}
