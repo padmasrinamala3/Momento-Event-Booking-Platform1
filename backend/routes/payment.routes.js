@@ -23,9 +23,7 @@ router.post("/create-order", async (req, res) => {
     const newBooking = await Booking.create({
       ...bookingData,
       bookingId: bookingData.id, // Map frontend 'id' to schema 'bookingId'
-      status: "pending",
-      price: amount,
-      advancePaid: 0,
+      status: "pending"
     });
 
     const options = {
@@ -140,9 +138,7 @@ router.post("/create-pending-booking", async (req, res) => {
       ...bookingData,
       bookingId: bookingData.id, // Map frontend 'id' to schema 'bookingId'
       status: "pending",
-      paymentMethod: "upi",
-      price: amount,
-      advancePaid: 0,
+      paymentMethod: "upi"
     });
 
     res.json({
