@@ -238,8 +238,7 @@ export const eventServices = {
     { name: "Mehendi Artist", price: 3500 },
     { name: "Makeup Artist (Bride)", price: 6000 },
     { name: "Flower Decoration", price: 15000 },
-    { name: "Horse Entry", price: 8000 },
-    { name: "Invitation Cards (100 pcs)", price: 1500 }
+    { name: "Horse Entry", price: 8000 }
   ],
   "Birthday": [
     { name: "Standard Catering", vegPrice: 150, nonVegPrice: 250 },
@@ -249,8 +248,7 @@ export const eventServices = {
     { name: "Magic Show (1 hr)", price: 4000 },
     { name: "Flower Decoration", price: 3000 },
     { name: "Drone Photography", price: 6000 },
-    { name: "Makeup Artist", price: 3000 },
-    { name: "Invitation Cards (50 pcs)", price: 800 }
+    { name: "Makeup Artist", price: 3000 }
   ],
   "Corporate Event": [
     { name: "Executive High Tea & Cookies", price: 15000 },
@@ -259,8 +257,7 @@ export const eventServices = {
     { name: "LED Wall", price: 22000 },
     { name: "Sound System + Mic", price: 10000 },
     { name: "Decoration (Formal)", price: 8000 },
-    { name: "Professional Drone Coverage", price: 8000 },
-    { name: "Invitation Cards (E-cards)", price: 3000 }
+    { name: "Professional Drone Coverage", price: 8000 }
   ],
   "Engagement": [
     { name: "Standard Catering", vegPrice: 200, nonVegPrice: 300 },
@@ -271,11 +268,10 @@ export const eventServices = {
     { name: "Makeup Artist", price: 5000 },
     { name: "Photography & Video", price: 12000 },
     { name: "Drone Photography", price: 7000 },
-    { name: "Car Decoration", price: 3500 },
-    { name: "Invitation Cards", price: 1200 }
+    { name: "Car Decoration", price: 3500 }
   ],
-  "Baby Shower": [{ name: "Theme Decoration", price: 5000 }, { name: "Catering (Customizable)", vegPrice: 200, nonVegPrice: 350 }, { name: "Custom Cake", price: 1800 }, { name: "Flower Decoration", price: 4000 }, { name: "Makeup Artist", price: 3000 }, { name: "Invitation Cards", price: 700 }],
-  "House Warming": [{ name: "Pooja Samagri Setup", price: 3500 }, { name: "Flower & Mango Leaf Decoration", price: 5000 }, { name: "Catering (Customizable)", vegPrice: 250, nonVegPrice: 400 }, { name: "Invitation Cards", price: 1000 }],
+  "Baby Shower": [{ name: "Theme Decoration", price: 5000 }, { name: "Catering (Customizable)", vegPrice: 200, nonVegPrice: 350 }, { name: "Custom Cake", price: 1800 }, { name: "Flower Decoration", price: 4000 }, { name: "Makeup Artist", price: 3000 }],
+  "House Warming": [{ name: "Pooja Samagri Setup", price: 3500 }, { name: "Flower & Mango Leaf Decoration", price: 5000 }, { name: "Catering (Customizable)", vegPrice: 250, nonVegPrice: 400 }],
   "Farewell Party": [
     { name: "Social Dinner Buffet", vegPrice: 180, nonVegPrice: 280 },
     { name: "DJ Night (3 hrs)", price: 8000 },
