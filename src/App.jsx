@@ -692,52 +692,12 @@ function Pricing({ onBookPkg }) {
 }
 
 // ── USER AUTH ──
-function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
+function UserAuth({ loggedInUser, setLoggedInUser, bookings, setBookings, onOpenInvoice }) {
   const revealRef = useSectionReveal();
   const [tab, setTab] = useState("login");
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [error, setError] = useState("");
-  const [showGoogleMock, setShowGoogleMock] = useState(false);
   const myBookings = bookings.filter(b => b.userEmail === loggedInUser?.email);
-
-  const mockGoogleAccounts = [
-    { name: "Padmasri Namala", email: "padmasri.n@gmail.com", avatar: "P" },
-    { name: "Srinivas Rao", email: "srinivas.rao@outlook.com", avatar: "S" },
-    { name: "Guest Explorer", email: "guest@moment-o.com", avatar: "G" }
-  ];
-
-  const cancelBooking = (id) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
-    fetch(`${API}/bookings/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "cancelled" })
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to cancel");
-        showToast("Booking cancelled successfully", "success");
-        setTimeout(() => window.location.reload(), 1500);
-      })
-      .catch(err => showToast("Error: " + err.message, "error"));
-  };
-
-  const finalizeGoogleLogin = (acc) => {
-    setShowGoogleMock(false);
-    showToast(`? Authorizing with Google...`, "processing");
-    
-    fetch(`${API}/auth/google-callback`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: acc.name, email: acc.email })
-    })
-      .then(r => r.json())
-      .then(data => {
-        if (data.message) { setError("? Google Auth Failed: " + data.message); return; }
-        setLoggedInUser(data);
-        showToast(" Welcome, " + data.name + "! Logged in via Google.", "confirmed");
-      })
-      .catch(err => setError("? Google Auth Error: " + err.message));
-  };
 
   const login = () => {
     if (!form.email || !form.password) { setError("✗ Fill email and password"); return; }
@@ -797,6 +757,21 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
   const logout = () => {
     setLoggedInUser(null); setForm({ name: "", email: "", phone: "", password: "" }); setTab("login");
     showToast("✓ Logged out", "");
+  };
+
+  const cancelBooking = (id) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    fetch(`${API}/bookings/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "cancelled" })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to cancel");
+        showToast("Booking cancelled successfully", "success");
+        setTimeout(() => window.location.reload(), 1500);
+      })
+      .catch(err => showToast("Error: " + err.message, "error"));
   };
 
   const badge = (status) => {
@@ -2366,22 +2341,6 @@ function PkgModal({ pkg, loggedInUser, onClose, onConfirm, bookings = [] }) {
             </button>
           </div>
 
-          <div className="services-title">Select Shift</div>
-          <div className="shift-selector">
-            <button className={`shift-btn${shift === "morning" ? " active" : ""}`} onClick={() => setShift("morning")}>
-              <span>☀️ Morning</span>
-              <span className="shift-time">8 AM - 3 PM</span>
-            </button>
-            <button className={`shift-btn${shift === "night" ? " active" : ""}`} onClick={() => setShift("night")}>
-              <span>🌙 Night</span>
-              <span className="shift-time">6 PM - 11 PM</span>
-            </button>
-            <button className={`shift-btn${shift === "midnight" ? " active" : ""}`} onClick={() => setShift("midnight")}>
-              <span>✨ Midnight</span>
-              <span className="shift-time">11 PM - 3 AM</span>
-            </button>
-          </div>
-
           <div style={{ marginTop: 15, background: "rgba(201,168,76,0.04)", padding: 12, borderRadius: 8, border: "1px solid rgba(201,168,76,0.1)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
               <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Advance Paid</span>
@@ -2942,6 +2901,7 @@ export default function App() {
         loggedInUser={loggedInUser} 
         setLoggedInUser={setLoggedInUser} 
         bookings={bookings} 
+        setBookings={setBookings} 
         onOpenInvoice={(id) => { setInvoiceId(id); setIsInvoiceAdmin(false); }} 
       />
       <Admin 
