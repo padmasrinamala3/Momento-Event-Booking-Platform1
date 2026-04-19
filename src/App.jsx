@@ -1922,9 +1922,9 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
       name, phone, event: event.name, date, venue, address, guests, special, theme,
       themeNumber: themeNum,
       services: selected.map(s => s.name).join(", "),
-      price: grandTotal,
-      advancePaid: advance,
-      remainingBalance: balance,
+      price: grandTotal, // 100% Total
+      advancePaid: advance, // 30% Advance
+      remainingBalance: balance, // 70% Balance
       status: "pending",
       payMode: payMode === "advance" ? "30% Advance + 70% Balance" : payMode === "emi" ? `30% Adv + EMI ₹${emi.toLocaleString("en-IN")}×3` : "Full Payment",
       userEmail: loggedInUser ? loggedInUser.email : "",
@@ -2246,9 +2246,9 @@ function PkgModal({ pkg, loggedInUser, onClose, onConfirm, bookings = [] }) {
       id: "BK" + Date.now().toString().slice(-6),
       name, phone, event: pkg.name + " Package", date,
       services: "Package Booking",
-      price: total,
-      advancePaid: advance,
-      remainingBalance: balance,
+      price: total, // 100% Total
+      advancePaid: advance, // 30% Advance
+      remainingBalance: balance, // 70% Balance
       status: "pending",
       payMode: "30% Advance Payment",
       userEmail: loggedInUser?.email || "guest",
@@ -2419,9 +2419,9 @@ function InvoiceModal({ bookingId, bookings, isAdminView, onClose }) {
 Your booking for *${b.event}* on *${b.date}* is *Confirmed*! ✅
 
 *Payment Summary:*
-✦ Total Amount: ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}
-✦ Advance Paid: ₹${b.advancePaid?.toLocaleString("en-IN") || "0"}
-✦ Remaining Balance: ₹${b.remainingBalance?.toLocaleString("en-IN") || "0"}
+✦ Total Amount (100%): ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}
+✦ Advance Paid (30%): ₹${b.advancePaid?.toLocaleString("en-IN") || "0"}
+✦ Remaining Balance (70%): ₹${b.remainingBalance?.toLocaleString("en-IN") || "0"}
 
 *Booking Details:*
 ✦ ID: *#${b.id}*
