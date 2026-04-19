@@ -828,7 +828,28 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, onOpenInvoice }) {
 
             <div className="dashboard-grid">
               <div className="dashboard-main">
-                <div className="section-subtitle-dash">◈ Recent Activity</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 15 }}>
+                  <div className="section-subtitle-dash" style={{ margin: 0 }}>◈ Recent Activity</div>
+                  {myBookings.length > 0 && (
+                    <button 
+                      className="btn-clear-history" 
+                      onClick={() => {
+                        if (window.confirm("⚠ Clear your entire booking history? This cannot be undone.")) {
+                          fetch(`${API}/bookings/user/clear/${loggedInUser.email}`, { method: "DELETE" })
+                            .then(r => r.json())
+                            .then(data => {
+                              if (data.success) {
+                                setBookings(prev => prev.filter(b => b.userEmail !== loggedInUser.email));
+                                showToast(`✓ Cleared ${data.count} bookings from your history`, "success");
+                              }
+                            })
+                            .catch(err => console.error("❌ Clear failed:", err));
+                        }
+                      }}
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.3)", color: "rgba(201,168,76,0.7)", padding: "4px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer", textTransform: "uppercase", letterSpacing: 1 }}
+                    >All Clear 🧹</button>
+                  )}
+                </div>
                 <div className="booking-card-list-alt">
                   {myBookings.length === 0 ? (
                     <div className="empty-state">
@@ -1193,11 +1214,33 @@ function Admin({ eventsData, setEventsData, bookings, setBookings, onOpenInvoice
                   <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, fontWeight: 300, color: "var(--gold)", margin: 0 }}>◈ All Bookings</h3>
                   <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{bookings.length} bookings</span>
                 </div>
-                <button className="btn-primary" style={{ padding: "6px 14px", fontSize: 11 }} onClick={() => {
-                  const out = "ID,Name,Phone,Event,Date,Shift,FoodType,Status,Total,Advance,Remaining,PayMode\n" + bookings.map(b => `"${b.id}","${b.name}","${b.phone}","${b.event}","${b.date}","${b.shift}","${b.foodType}","${b.status}","${b.price}","${b.advancePaid}","${b.remainingBalance}","${b.payMode}"`).join("\n");
-                  const url = window.URL.createObjectURL(new Blob([out], { type: 'text/csv' }));
-                  const a = document.createElement('a'); a.href = url; a.download = `bookings_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
-                }}>Export CSV ⬇</button>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button className="btn-primary" style={{ padding: "6px 14px", fontSize: 11 }} onClick={() => {
+                    const out = "ID,Name,Phone,Event,Date,Shift,FoodType,Status,Total,Advance,Remaining,PayMode\n" + bookings.map(b => `"${b.id}","${b.name}","${b.phone}","${b.event}","${b.date}","${b.shift}","${b.foodType}","${b.status}","${b.price}","${b.advancePaid}","${b.remainingBalance}","${b.payMode}"`).join("\n");
+                    const url = window.URL.createObjectURL(new Blob([out], { type: 'text/csv' }));
+                    const a = document.createElement('a'); a.href = url; a.download = `bookings_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+                  }}>Export CSV ⬇</button>
+                  <button 
+                    className="btn-del" 
+                    style={{ padding: "6px 14px", fontSize: 11, background: "rgba(224,90,90,0.1)", color: "#e05a5a", border: "1px solid #e05a5a" }} 
+                    onClick={() => {
+                      if (window.confirm("🚨 CRITICAL: Are you absolutely sure you want to clear the ENTIRE bookings database? This action is permanent!")) {
+                        const secondChance = window.confirm("Double confirmation: Do you really want to DESTROY all booking records?");
+                        if (secondChance) {
+                          fetch(`${API}/bookings/admin/clear-all`, { method: "DELETE" })
+                            .then(r => r.json())
+                            .then(data => {
+                              if (data.success) {
+                                setBookings([]);
+                                showToast("🚨 SYSTEM WIPE: All records destroyed", "success", 5000);
+                              }
+                            })
+                            .catch(err => console.error("❌ Wipe failed:", err));
+                        }
+                      }
+                    }}
+                  >All Clear 🧹</button>
+                </div>
               </div>
               {bookings.length === 0 ? <div className="no-bookings">No bookings yet.</div> : bookings.map((b, i) => {
                 const statusColors = { pending: "#f0a500", confirmed: "#c9a84c", completed: "#4caf82", cancelled: "#e05a5a" };

@@ -119,4 +119,29 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// CLEAR ALL BOOKINGS FOR A USER
+router.delete("/user/clear/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    console.log("🗑 Clearing all bookings for user:", email);
+    const result = await Booking.deleteMany({ userEmail: email });
+    res.json({ success: true, message: `Cleared ${result.deletedCount} bookings`, count: result.deletedCount });
+  } catch (err) {
+    console.error("❌ Clear user history failed:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ADMIN: CLEAR ENTIRE BOOKINGS COLLECTION
+router.delete("/admin/clear-all", async (req, res) => {
+  try {
+    console.log("⚠ ADMIN ACTION: Clearing entire bookings database");
+    const result = await Booking.deleteMany({});
+    res.json({ success: true, message: "Entire database cleared", count: result.deletedCount });
+  } catch (err) {
+    console.error("❌ Admin clear all failed:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
