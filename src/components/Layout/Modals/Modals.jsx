@@ -190,9 +190,8 @@ export const PackageModal = ({ pkg, onClose }) => {
 };
 
 // ── INVOICE MODAL ──
-export const InvoiceModal = ({ bookingId, onClose }) => {
-  const { bookings } = useApp();
-  const b = bookings.find(x => x.id === bookingId);
+export const InvoiceModal = ({ bookingId, bookings, onClose }) => {
+  const b = bookings?.find(x => x.id === bookingId) || bookings?.find(x => x._id === bookingId);
   if (!b) return null;
 
   return (
@@ -212,6 +211,14 @@ export const InvoiceModal = ({ bookingId, onClose }) => {
             <thead><tr><th>Description</th><th>Details</th><th style={{ textAlign:"right" }}>Amount</th></tr></thead>
             <tbody>
               <tr><td>{b.event}</td><td>{b.date}</td><td>—</td></tr>
+              {b.themeNum && (
+                <tr>
+                  <td colSpan={2} style={{ color: "var(--gold)", fontSize: 12, fontWeight: 500 }}>
+                    🎨 Decoration Theme #{b.themeNum}
+                  </td>
+                  <td style={{ color: "var(--gold)", fontWeight: 600 }}>Selected</td>
+                </tr>
+              )}
               {b.services.split(", ").map((s, i) => <tr key={i}><td colSpan={2} style={{ color:"#888", fontSize:11 }}>{s}</td><td>Included</td></tr>)}
               <tr><td colSpan={2} style={{ color:"#aaa", fontSize:10 }}>Payment Mode</td><td>{b.payMode || "Full"}</td></tr>
             </tbody>

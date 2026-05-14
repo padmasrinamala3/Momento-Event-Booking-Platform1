@@ -238,7 +238,9 @@ export const eventServices = {
     { name: "Mehendi Artist", price: 3500 },
     { name: "Makeup Artist (Bride)", price: 6000 },
     { name: "Flower Decoration", price: 15000 },
-    { name: "Horse Entry", price: 8000 }
+    { name: "Vintage Car Entry", price: 12000 },
+    { name: "Royal Chariot (Sarot)", price: 15000 },
+    { name: "Horse Entry (Premium)", price: 8000 }
   ],
   "Birthday": [
     { name: "Standard Catering", vegPrice: 150, nonVegPrice: 250 },
@@ -326,6 +328,7 @@ export const eventServices = {
     { name: "Premium Stage Decoration", price: 25000 },
     { name: "Cinematic Videography", price: 15000 },
     { name: "Flower Arrangements", price: 10000 },
+    { name: "Vintage Car Entry", price: 12000 },
     { name: "Live Music/Singer", price: 12000 }
   ],
   "Mehandi": [

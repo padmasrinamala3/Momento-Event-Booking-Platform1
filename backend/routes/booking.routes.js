@@ -144,4 +144,41 @@ router.delete("/admin/clear-all", async (req, res) => {
   }
 });
 
+// Validate Coupon Code
+router.post('/validate-coupon', async (req, res) => {
+    const { code, totalAmount } = req.body;
+    
+    // Hardcoded Coupons for Demo
+    const coupons = {
+        "MOMENTO10": { type: "percent", value: 10 },
+        "OFFER500": { type: "flat", value: 500 },
+        "GRANDOPENING": { type: "flat", value: 1000 },
+        "VIP20": { type: "percent", value: 20 }
+    };
+
+    const normalizedCode = code?.trim().toUpperCase();
+    const coupon = coupons[normalizedCode];
+
+    if (!coupon) {
+        return res.status(400).json({ valid: false, message: "Invalid or expired coupon code" });
+    }
+
+    let discount = 0;
+    if (coupon.type === "percent") {
+        discount = (totalAmount * coupon.value) / 100;
+    } else {
+        discount = coupon.value;
+    }
+
+    res.json({
+        valid: true,
+        code: code.toUpperCase(),
+        type: coupon.type,
+        value: coupon.value,
+        discount: Math.round(discount),
+        newTotal: Math.round(totalAmount - discount),
+        message: `Success! ${coupon.type === "percent" ? coupon.value + "%" : "₹" + coupon.value} discount applied.`
+    });
+});
+
 module.exports = router;

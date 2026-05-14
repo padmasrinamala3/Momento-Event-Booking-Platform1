@@ -26,6 +26,9 @@ const bookingSchema = new mongoose.Schema({
   razorpaySignature: { type: String },
   upiTransactionId: { type: String },
   paymentMethod: { type: String, enum: ["razorpay", "upi"], default: "razorpay" },
+  discount: { type: Number, default: 0 },
+  couponCode: { type: String, default: "" },
+  basePrice: { type: Number },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Booking", bookingSchema);

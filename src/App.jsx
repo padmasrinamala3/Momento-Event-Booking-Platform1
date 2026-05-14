@@ -6,6 +6,19 @@ import { eventsDataDefault, eventServices, categorizedMenus, WHATSAPP } from "./
 
 const API = process.env.REACT_APP_API_URL || "/api";
 
+const getSvcIcon = (name) => {
+  const low = name.toLowerCase();
+  if (low.includes("catering") || low.includes("food")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>;
+  if (low.includes("decor")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
+  if (low.includes("photo") || low.includes("video")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>;
+  if (low.includes("dj") || low.includes("music") || low.includes("sound")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
+  if (low.includes("artist") || low.includes("makeup") || low.includes("mehendi")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>;
+  if (low.includes("car")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 10.7 2 11.3 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>;
+  if (low.includes("horse") || low.includes("chariot") || low.includes("sarot")) return <span style={{fontSize:14}}>🐎</span>;
+  if (low.includes("entry")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>;
+  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>;
+};
+
 // ── TOAST ──
 let _setToasts = null;
 function showToast(msg, type = "", duration = 3000) {
@@ -252,16 +265,7 @@ function EventCostCalculator() {
   const toggle = (s) => setSelected(p => p.find(x => x.name === s.name) ? p.filter(x => x.name !== s.name) : [...p, s]);
   const navTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
-  // Icons mapping
-  const getSvcIcon = (name) => {
-    const low = name.toLowerCase();
-    if (low.includes("catering") || low.includes("food")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>;
-    if (low.includes("decor")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
-    if (low.includes("photo") || low.includes("video")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>;
-    if (low.includes("dj") || low.includes("music") || low.includes("sound")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
-    if (low.includes("artist") || low.includes("makeup") || low.includes("mehendi")) return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>;
-    return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>;
-  };
+  // Icons mapping moved to global scope
 
   return (
     <section id="calculator" className="section-reveal" ref={revealRef} style={{ padding: "80px 0" }}>
@@ -826,7 +830,7 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, setBookings, onOpen
                   )}
                 </div>
                 <div className="booking-card-list-alt">
-                  {myBookings.length === 0 ? (
+                {myBookings.length === 0 ? (
                     <div className="empty-state">
                       <p>You haven't booked any events yet.</p>
                       <button className="btn-primary" style={{ padding: "8px 20px" }} onClick={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })}>Browse Events</button>
@@ -835,7 +839,14 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, setBookings, onOpen
                     <div key={i} className="dashboard-booking-card">
                       <div className="dbc-info">
                         <div className="dbc-id">{b.id}</div>
-                        <div className="dbc-event">{b.event}</div>
+                        <div className="dbc-event" style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                          {b.event}
+                          {b.themeNum && (
+                            <span style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.4)", color: "var(--gold)", fontSize: 10, padding: "2px 8px", borderRadius: 12, letterSpacing: 1, fontWeight: 600 }}>
+                              🎨 Theme #{b.themeNum}
+                            </span>
+                          )}
+                        </div>
                         <div className="dbc-footer">
                           <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign: 'text-bottom', marginRight: 4}}><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                           {b.date} · {b.shift}
@@ -863,8 +874,8 @@ function UserAuth({ loggedInUser, setLoggedInUser, bookings, setBookings, onOpen
               <div className="dashboard-side">
                 <div className="section-subtitle-dash">✦ Quick Actions</div>
                 <div className="quick-actions-list">
-                  <div className="qa-item"><span>📞 Need Help?</span><a href="tel:+918123456789">+91 81234 56789</a></div>
-                  <div className="qa-item"><span>💬 WhatsApp</span><a href="#">Chat with Expert</a></div>
+                  <div className="qa-item"><span>📞 Need Help?</span><a href="tel:+918106296055">+91 81062 96055</a></div>
+                  <div className="qa-item"><span>💬 WhatsApp</span><a href={`https://wa.me/${WHATSAPP}?text=Hello%20MomentO!`} target="_blank" rel="noreferrer">Chat with Expert</a></div>
                   <div className="qa-item"><span>⭐ Review</span><button onClick={() => document.getElementById('rating')?.scrollIntoView({ behavior: 'smooth' })}>Rate us</button></div>
                 </div>
 
@@ -1887,6 +1898,9 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
   const [theme, setTheme] = useState("");
   const [themeNum, setThemeNum] = useState(loggedInUser?.preSelectedThemeNum || "");
   const [foodType, setFoodType] = useState("veg");
+  const [appliedCoupon, setAppliedCoupon] = useState("");
+  const [couponData, setCouponData] = useState(null); // { type, value }
+  const [couponInput, setCouponInput] = useState("");
   const themes = [
     { name: "Royal Gold", gradient: "linear-gradient(135deg,#C9A84C,#8B6914)" },
     { name: "Pastel Pink", gradient: "linear-gradient(135deg,#ec4899,#f9a8d4)" },
@@ -1908,14 +1922,39 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
     return a + (s.price || 0);
   }, 0);
 
-  const themePrice = event.themes?.find(t => t.num == themeNum)?.price || 0;
-  const grandTotal = total + themePrice;
+  const themePrice = event.themes?.find(t => Number(t.num) === Number(themeNum))?.price || 0;
+  const baseTotal = total + themePrice;
+  const currentDiscount = couponData 
+    ? (couponData.type === "percent" ? Math.round((baseTotal * couponData.value) / 100) : couponData.value)
+    : 0;
+  const grandTotal = Math.max(0, baseTotal - currentDiscount);
   const advance = Math.ceil(grandTotal * 0.3);
   const balance = grandTotal - advance;
   const emi = Math.ceil(balance / 3);
   const services = eventServices[event?.name] || [];
   const hasCateringSupport = services.some(s => s.vegPrice || s.nonVegPrice);
   const toggle = (s) => setSelected(p => p.find(x => x.name === s.name) ? p.filter(x => x.name !== s.name) : [...p, s]);
+
+  const applyCoupon = () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    fetch(`${API}/bookings/validate-coupon`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: code, totalAmount: baseTotal })
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.valid) {
+          setCouponData({ type: data.type, value: data.value });
+          setAppliedCoupon(data.code);
+          showToast(data.message, "success");
+        } else {
+          showToast(data.message, "error");
+        }
+      })
+      .catch(err => showToast("Error validating coupon", "error"));
+  };
 
   const pay = () => {
     if (!name || !phone || !date || !venue || !address || (!selected.length && !themeNum)) {
@@ -1935,14 +1974,27 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
       return;
     }
 
+    // Recalculate everything one last time to avoid stale closure issues
+    const finalThemePrice = event.themes?.find(t => Number(t.num) === Number(themeNum))?.price || 0;
+    const finalBaseTotal = total + finalThemePrice;
+    const finalDiscount = couponData 
+      ? (couponData.type === "percent" ? Math.round((finalBaseTotal * couponData.value) / 100) : couponData.value)
+      : 0;
+    const finalGrandTotal = Math.max(0, finalBaseTotal - finalDiscount);
+    const finalAdvance = Math.ceil(finalGrandTotal * 0.3);
+    const finalBalance = finalGrandTotal - finalAdvance;
+
     const b = {
       id: "BK" + Date.now().toString().slice(-6),
       name, phone, event: event.name, date, venue, address, guests, special, theme,
       themeNumber: themeNum,
       services: selected.map(s => s.name).join(", "),
-      price: grandTotal, // 100% Total
-      advancePaid: advance, // 30% Advance
-      remainingBalance: balance, // 70% Balance
+      price: finalGrandTotal, // Final Discounted Total
+      basePrice: finalBaseTotal, // Original Total
+      discount: finalDiscount,
+      couponCode: appliedCoupon,
+      advancePaid: finalAdvance, // 30% Advance
+      remainingBalance: finalBalance, // 70% Balance
       status: "pending",
       payMode: payMode === "advance" ? "30% Advance + 70% Balance" : payMode === "emi" ? `30% Adv + EMI ₹${emi.toLocaleString("en-IN")}×3` : "Full Payment",
       userEmail: loggedInUser ? loggedInUser.email : "",
@@ -1976,6 +2028,9 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
               themeNumber: pendingBooking.themeNumber,
               services: pendingBooking.services,
               price: pendingBooking.price,
+              basePrice: pendingBooking.basePrice,
+              discount: pendingBooking.discount,
+              couponCode: pendingBooking.couponCode,
               advancePaid: pendingBooking.advancePaid,
               remainingBalance: pendingBooking.remainingBalance,
               status: pendingBooking.status,
@@ -2003,6 +2058,41 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
           <div className="modal-title">Book {event?.name}</div>
         </div>
         <div className="modal-body">
+
+          {/* ── SELECTED THEME BADGE ── */}
+          {themeNum && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 14,
+              background: "linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04))",
+              border: "1px solid rgba(201,168,76,0.4)",
+              borderRadius: 12, padding: "14px 16px", marginBottom: 18
+            }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: "50%",
+                background: "rgba(201,168,76,0.15)",
+                border: "2px solid var(--gold)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 20, flexShrink: 0
+              }}>🎨</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)", opacity: 0.8, marginBottom: 3 }}>Selected Decoration</div>
+                <div style={{ fontSize: 17, color: "#fff", fontFamily: "'Cormorant Garamond',serif" }}>
+                  Theme <strong style={{ color: "var(--gold)", fontSize: 20 }}>#{themeNum}</strong>
+                  {event?.themes?.find(t => t.num == themeNum) && (
+                    <span style={{ fontSize: 12, color: "var(--gold)", marginLeft: 10 }}>
+                      · ₹{event.themes.find(t => t.num == themeNum).price?.toLocaleString("en-IN")}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div style={{
+                background: "rgba(201,168,76,0.2)", border: "1px solid rgba(201,168,76,0.5)",
+                padding: "4px 12px", borderRadius: 20, fontSize: 9,
+                color: "var(--gold)", letterSpacing: 1.5, fontWeight: 700, flexShrink: 0
+              }}>CONFIRMED ✓</div>
+            </div>
+          )}
+
           <input className="modal-input" type="text" placeholder="Your Full Name" value={name} onChange={e => setName(e.target.value)} />
           <input className="modal-input" type="tel" placeholder="Phone Number" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} />
           <input className="modal-input" type="number" placeholder="Estimated Guest Count" value={guests} onChange={e => setGuests(e.target.value)} />
@@ -2171,7 +2261,10 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
               return (
                 <div key={i} className="service-item" onClick={() => toggle(s)}>
                   <div className={`service-cb${sel ? " checked" : ""}`}>{sel ? "✓" : ""}</div>
-                  <label>{s.name} {(s.vegPrice || s.nonVegPrice) ? `(₹${pricePerPlate}/plate)` : ""}</label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, cursor: "pointer" }}>
+                    <span style={{ color: "var(--gold)", opacity: 0.8, display: "flex", alignItems: "center", justifyContent: "center" }}>{getSvcIcon(s.name)}</span>
+                    <span>{s.name} {(s.vegPrice || s.nonVegPrice) ? `(₹${pricePerPlate}/plate)` : ""}</span>
+                  </label>
                   <span className="price-tag">₹{displayPrice.toLocaleString("en-IN")}</span>
                 </div>
               );
@@ -2182,22 +2275,38 @@ function BookingModal({ event, loggedInUser, onClose, onConfirm, bookings = [] }
           <div style={{ fontSize: 10, color: "var(--gold)", marginBottom: 8, opacity: 0.8 }}>💡 Tip: Mention your favorite custom dishes or menu changes here.</div>
           <textarea className="modal-input" placeholder="e.g. Add Extra Starters, Change Sweet to Kheer, etc." value={special} onChange={e => setSpecial(e.target.value)} style={{ minHeight: 60, paddingTop: 12 }} />
 
-          <div className="services-title">Decoration Theme Number</div>
-          <div className="theme-num-box">
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Current selection:</span>
-              <span style={{ fontSize: 13, color: "var(--gold)", fontWeight: 600 }}>{themeNum ? `Theme #${themeNum}` : "None"}</span>
-            </div>
-            <div className="theme-num-selector">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                <button key={n} className={`t-num-btn${themeNum == n ? " active" : ""}`} onClick={() => setThemeNum(n.toString())}>{n}</button>
-              ))}
-            </div>
-            <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8 }}>Tip: Click the event image in the events section to view photos for each theme number.</p>
+          <div className="services-title">Promo / Coupon Code</div>
+          <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+            <input 
+              className="modal-input" 
+              style={{ marginBottom: 0, flex: 1 }} 
+              placeholder="Enter Code (e.g. MOMENTO10)" 
+              value={couponInput} 
+              onChange={e => setCouponInput(e.target.value)} 
+              disabled={!!appliedCoupon}
+            />
+            <button 
+              className="btn-primary" 
+              style={{ width: "auto", padding: "0 20px", borderRadius: 10, fontSize: 11 }}
+              onClick={applyCoupon}
+              disabled={!!appliedCoupon}
+            >{appliedCoupon ? "✓ Applied" : "Apply"}</button>
           </div>
 
           <div className="total-bar" style={{ background: "rgba(201,168,76,0.08)" }}>
-            <div className="total-label">Total Amount</div>
+            <div className="total-label">Sub Total</div>
+            <div className="total-amount" style={{ fontSize: 16, opacity: 0.7 }}>₹{baseTotal.toLocaleString("en-IN")}</div>
+          </div>
+
+          {currentDiscount > 0 && (
+            <div className="total-bar" style={{ background: "rgba(76,201,130,0.05)", borderTop: "none", marginTop: -1 }}>
+              <div className="total-label" style={{ color: "var(--gold)" }}>Coupon Discount ({appliedCoupon})</div>
+              <div className="total-amount" style={{ color: "#4caf82" }}>- ₹{currentDiscount.toLocaleString("en-IN")}</div>
+            </div>
+          )}
+
+          <div className="total-bar">
+            <div className="total-label">Grand Total</div>
             <div className="total-amount">₹{grandTotal.toLocaleString("en-IN")}</div>
           </div>
 
@@ -2414,23 +2523,30 @@ function InvoiceModal({ bookingId, bookings, isAdminView, onClose }) {
   const b = bookings.find(x => x.id === bookingId);
   if (!b) return null;
 
-  const WHATSAPP = "8106296055"; // Business Phone
-  const targetPhone = isAdminView ? WHATSAPP : (b.phone?.toString().startsWith('91') ? b.phone : '91' + b.phone);
-  const message = `${isAdminView ? 'Admin Copy of Invoice\n' : ''}Hello *${b.name}* ! ✨
+  // Always send to CUSTOMER phone — avoids duplicate on admin's own phone
+  const customerPhone = b.phone?.toString().startsWith('91') ? b.phone : '91' + b.phone;
+  const adminPhone = "918106296055";
 
-Your booking for *${b.event}* on *${b.date}* is *Confirmed*! ✅
+  // Clean message for customer
+  const customerMessage = `Hello *${b.name}* ! ✨
+
+Your booking for *${b.event}* on *${b.date}* is *Confirmed*! ✅${b.themeNumber ? `\n🎨 *Decoration Theme:* #${b.themeNumber}` : ''}
 
 *Payment Summary:*
-✦ Total Amount (100%): ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}
+✦ Sub Total: ₹${b.basePrice?.toLocaleString("en-IN") || (typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price)}${b.discount > 0 ? `\n✦ Discount (${b.couponCode}): - ₹${b.discount.toLocaleString("en-IN")}` : ''}
+✦ Total Amount: ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}
 ✦ Advance Paid (30%): ₹${b.advancePaid?.toLocaleString("en-IN") || "0"}
-✦ Remaining Balance (70%): ₹${b.remainingBalance?.toLocaleString("en-IN") || "0"}
+✦ Balance (70%): ₹${b.remainingBalance?.toLocaleString("en-IN") || "0"}
 
 *Booking Details:*
 ✦ ID: *#${b.id}*
 ✦ Event: *${b.event}*
-✦ Date: *${b.date}* (${b.shift})
+✦ Date: *${b.date}* (${b.shift})${b.services ? `\n✦ Services: ${b.services}` : ''}
 
 Thank you for choosing *MomentO Events* ! 🙏`;
+
+  // Admin-only copy (shorter)
+  const adminMessage = `📋 *Admin Copy*\n*${b.event}* | ${b.name} | ${b.date}\nID: #${b.id} | ₹${typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}${b.themeNumber ? ` | Theme #${b.themeNumber}` : ''}`;
 
   return (
     <div className="invoice-modal-overlay open" onClick={onClose}>
@@ -2448,15 +2564,47 @@ Thank you for choosing *MomentO Events* ! 🙏`;
               <tr><td>{b.event}</td><td>{b.date}</td><td>₹{typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price}</td></tr>
               {b.themeNumber && (
                 <tr>
-                  <td>Decoration Theme</td>
-                  <td>Theme #{b.themeNumber}</td>
-                  <td style={{ textAlign: "right" }}>Included</td>
+                  <td style={{ color: "var(--gold)", fontWeight: 600 }}>🎨 Decoration Theme</td>
+                  <td style={{ color: "var(--gold)", fontWeight: 700, letterSpacing: 1 }}>Theme #{b.themeNumber}</td>
+                  <td style={{ textAlign: "right", color: "var(--gold)", fontWeight: 600 }}>Selected ✓</td>
                 </tr>
               )}
               {b.services && b.services.split(", ").map((s, i) => (
                 <tr key={i}><td colSpan={2} style={{ paddingLeft: 10, fontSize: 11, color: "#666" }}>• {s}</td><td style={{ textAlign: "right", fontSize: 11, color: "#666" }}>Included</td></tr>
               ))}
+              {b.discount > 0 && b.couponCode && (
+                <tr style={{ border: "none" }}>
+                  <td colSpan={3} style={{ paddingTop: 14, paddingBottom: 6 }}>
+                    <div style={{
+                      background: "linear-gradient(135deg, rgba(76,175,130,0.12), rgba(76,175,130,0.05))",
+                      border: "1px solid rgba(76,175,130,0.35)",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 10
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 16 }}>🎟️</span>
+                        <div>
+                          <div style={{ fontSize: 10, color: "#4caf82", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Coupon Applied</div>
+                          <div style={{ fontSize: 13, color: "#fff", fontWeight: 600, letterSpacing: 2, fontFamily: "monospace", marginTop: 1 }}>{b.couponCode}</div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontSize: 10, color: "#888", textTransform: "uppercase", letterSpacing: 1 }}>You Saved</div>
+                        <div style={{ fontSize: 16, color: "#4caf82", fontWeight: 700 }}>- ₹{b.discount.toLocaleString("en-IN")}</div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
               <tr><td colSpan={2} style={{ color: "#888", fontSize: 10, paddingTop: 15 }}>Payment Summary</td><td></td></tr>
+              <tr style={{ border: "none" }}><td colSpan={2} style={{ paddingLeft: 20 }}>✦ Sub Total</td><td style={{ textAlign: "right", fontSize: 11, color: "#888" }}>₹{b.basePrice?.toLocaleString("en-IN") || (typeof b.price === "number" ? b.price.toLocaleString("en-IN") : b.price)}</td></tr>
+              {b.discount > 0 && (
+                <tr style={{ border: "none" }}><td colSpan={2} style={{ paddingLeft: 20, color: "#4caf82" }}>✦ Discount ({b.couponCode})</td><td style={{ textAlign: "right", color: "#4caf82" }}>- ₹{b.discount.toLocaleString("en-IN")}</td></tr>
+              )}
               <tr style={{ border: "none" }}><td colSpan={2} style={{ paddingLeft: 20 }}>✦ Advance Paid (30%)</td><td style={{ textAlign: "right" }}>₹{b.advancePaid?.toLocaleString("en-IN") || "—"}</td></tr>
               <tr style={{ border: "none" }}><td colSpan={2} style={{ paddingLeft: 20 }}>✦ Remaining Balance (70%)</td><td style={{ textAlign: "right" }}>₹{b.remainingBalance?.toLocaleString("en-IN") || "—"}</td></tr>
             </tbody>
@@ -2475,15 +2623,29 @@ Thank you for choosing *MomentO Events* ! 🙏`;
         </div>
         <div className="invoice-actions no-print">
           <button className="btn-download-invoice" onClick={() => window.print()}>⬇ Download / Print</button>
+          {/* Customer Button (Always visible) */}
           <a 
-            href={`https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`} 
+            href={`https://wa.me/${customerPhone}?text=${encodeURIComponent(customerMessage)}`} 
             target="_blank" 
             rel="noreferrer" 
             className="btn-whatsapp-premium-action"
           >
             <svg style={{ verticalAlign: "middle", marginRight: 8 }} width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-            Send Invoice on WhatsApp
+            Send to Customer
           </a>
+
+          {/* Admin Copy Button (Only in Admin View) */}
+          {isAdminView && (
+            <a 
+              href={`https://wa.me/${adminPhone}?text=${encodeURIComponent(adminMessage)}`} 
+              target="_blank" 
+              rel="noreferrer" 
+              className="btn-whatsapp-premium-action"
+              style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.4)", color: "#a855f7" }}
+            >
+              📋 Copy to Admin
+            </a>
+          )}
           <button className="btn-close-invoice" onClick={onClose}>Close</button>
         </div>
       </div>
@@ -2857,7 +3019,15 @@ export default function App() {
             userEmail: b.userEmail || "guest",
             shift: b.shift || "night",
             venue: b.venue,
-            address: b.address || ""
+            address: b.address || "",
+            themeNum: b.themeNum || b.themeNumber || null,
+            themeNumber: b.themeNumber || b.themeNum || null,
+            basePrice: b.basePrice || b.price,
+            discount: b.discount || 0,
+            couponCode: b.couponCode || "",
+            foodType: b.foodType || "",
+            guests: b.guests || "",
+            special: b.special || ""
           })));
         }
       })
@@ -2931,8 +3101,9 @@ export default function App() {
         />
       )}
       {bookingEvent && (
-        <BookingModal
+      <BookingModal
           event={bookingEvent}
+          preSelectedThemeNum={selectedThemeNum}
           loggedInUser={{ ...loggedInUser, preSelectedThemeNum: selectedThemeNum }}
           onClose={() => { setBookingEvent(null); setSelectedThemeNum(null); }}
           onConfirm={(b) => setBookings(p => [...p, b])}

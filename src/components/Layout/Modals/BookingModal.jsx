@@ -4,7 +4,7 @@ import { showToast } from "../Layout/Layout";
 import { eventServices } from "../../data/constants";
 import API_BASE from "../../../config/api";
 
-const BookingModal = ({ event, onClose }) => {
+const BookingModal = ({ event, onClose, preSelectedThemeNum }) => {
 
   const { loggedInUser, addBooking } = useApp();
   const [name, setName] = useState(loggedInUser?.name || "");
@@ -52,7 +52,8 @@ const BookingModal = ({ event, onClose }) => {
       phone,
       services: selected.map(s => s.name).join(", "),
       price: total,
-      user: loggedInUser?._id || loggedInUser?.id || "unknown"
+      user: loggedInUser?._id || loggedInUser?.id || "unknown",
+      ...(preSelectedThemeNum ? { themeNum: preSelectedThemeNum } : {})
     };
 
     try {
@@ -222,6 +223,24 @@ const BookingModal = ({ event, onClose }) => {
             value={date}
             onChange={e => setDate(e.target.value)}
           />
+
+          {preSelectedThemeNum && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 12,
+              background: "rgba(201,168,76,0.08)",
+              border: "1px solid rgba(201,168,76,0.3)",
+              borderRadius: 10, padding: "10px 14px", marginBottom: 14
+            }}>
+              <span style={{ fontSize: 20 }}>🎨</span>
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)", opacity: 0.8 }}>Selected Decoration</div>
+                <div style={{ fontSize: 15, color: "#fff", fontFamily: "'Cormorant Garamond',serif", marginTop: 2 }}>
+                  Theme <strong style={{ color: "var(--gold)" }}>#{preSelectedThemeNum}</strong>
+                </div>
+              </div>
+              <div style={{ marginLeft: "auto", background: "rgba(201,168,76,0.15)", padding: "3px 10px", borderRadius: 20, fontSize: 10, color: "var(--gold)", letterSpacing: 1 }}>CONFIRMED ✓</div>
+            </div>
+          )}
 
           <div className="services-title">Select Services</div>
 
