@@ -4,10 +4,24 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const Booking = require("../models/Booking");
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+let razorpay;
+try {
+  if (process.env.RAZORPAY_KEY_ID && 
+      process.env.RAZORPAY_KEY_SECRET && 
+      process.env.RAZORPAY_KEY_ID !== 'YOUR_RAZORPAY_KEY_ID' &&
+      process.env.RAZORPAY_KEY_ID !== 'placeholder') {
+    razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+    console.log("✅ Razorpay Initialized Successfully");
+  } else {
+    console.warn("⚠️ RAZORPAY_KEY_ID is missing or placeholder. Payments will be disabled.");
+  }
+} catch (err) {
+  console.error("❌ Razorpay Initialization Error:", err.message);
+}
+
 
 // 0. GET RAZORPAY KEY ID
 router.get("/get-key", (req, res) => {
@@ -18,6 +32,13 @@ router.get("/get-key", (req, res) => {
 router.post("/create-order", async (req, res) => {
   try {
     const { amount, currency = "INR", bookingData } = req.body;
+    
+    if (!razorpay) {
+      return res.status(503).json({ 
+        message: "Online payments are currently disabled (Razorpay not configured).",
+        bookingId: bookingData.id
+      });
+    }
     
     // Create the booking in 'pending' status first
     const newBooking = await Booking.create({
@@ -61,6 +82,10 @@ router.post("/verify-payment", async (req, res) => {
       razorpay_signature,
       bookingId // The custom BKxxxxxx ID
     } = req.body;
+
+    if (!razorpay) {
+      return res.status(503).json({ message: "Payment verification service unavailable." });
+    }
 
     // Verify signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
