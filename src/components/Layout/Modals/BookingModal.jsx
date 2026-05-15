@@ -296,6 +296,3 @@ const BookingModal = ({ event, onClose, preSelectedThemeNum }) => {
 };
 
 export default BookingModal;
-
-
-export default BookingModal;
