@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useApp } from "../../context/AppContext";
-import { showToast } from "../Layout/Layout";
+import { useApp } from "../../../context/AppContext";
+import { showToast } from "../Layout";
 import API_BASE from "../../../config/api";
 
 // ── PACKAGE MODAL ──

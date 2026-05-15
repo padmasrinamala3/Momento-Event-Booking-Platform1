@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useApp } from "../../context/AppContext";
-import { showToast } from "../Layout/Layout";
-import { eventServices, eventsDataDefault } from "../../data/constants";
+import { useApp } from "../../../context/AppContext";
+import { showToast } from "../Layout";
+import { eventServices, eventsDataDefault } from "../../../data/constants";
 import API_BASE from "../../../config/api";
 
 const BookingModal = ({ event, onClose, preSelectedThemeNum }) => {
